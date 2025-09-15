@@ -20,11 +20,17 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Copy composer files first for better layer caching
+COPY api/composer.json api/composer.lock* ./
+
+# Install PHP deps (without dev dependencies for production readiness)
+RUN composer install --no-dev --no-interaction --optimize-autoloader --no-scripts
+
 # Copy Laravel files
 COPY api/ /var/www/html
 
-# Install PHP deps
-RUN composer install --no-dev --optimize-autoloader
+# Complete composer installation (run scripts)
+RUN composer install --no-dev --no-interaction --optimize-autoloader
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \

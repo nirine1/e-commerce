@@ -43,7 +43,7 @@ Before running this application, make sure you have installed:
    docker-compose up --build
    ```
 
-4. **Generate Laravel application key** (in another terminal)
+4. **Generate Laravel application key** (in another terminal, optional)
    ```bash
    docker-compose exec api php artisan key:generate
    ```
@@ -56,6 +56,9 @@ Before running this application, make sure you have installed:
 6. **Access the application**
    - **Frontend (React)**: `http://localhost:3000`
    - **API (Laravel)**: run `curl http://localhost:8080/api/health` or send a GET request to the same endpoint.
+
+7. **Troubleshooting**
+   - **If the curl to API does not work**: install composer dependencies manually in the container : `composer-compose exec api composer install`.
 
 ## Services
 
