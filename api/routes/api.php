@@ -8,5 +8,5 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/health', function (Request $request) {
-    return response()->json(['message', 'I\'m alive!']);
+    return response()->json(['message' => 'I\'m alive!']);
 });
