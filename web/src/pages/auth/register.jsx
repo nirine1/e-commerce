@@ -1,3 +1,17 @@
+import { useState } from "react";
+import { useFormik } from 'formik';
+import { validationSchema } from "../../validations/register";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Button } from '@/components/ui/button'
+import { FormField } from "../../components/form-field";
+import { authService } from "../../services/auth";
+import { tokenService } from "../../services/token";
+
 export default function Register() {
     const [apiError, setApiError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -23,16 +37,11 @@ export default function Register() {
                 });
 
                 if (result.success) {
-                    console.log('Utilisateur:', result.data.user);
-                    console.log('Token:', result.data.token);
-
-                    // Sauvegarder le token
                     tokenService.setToken(result.data.token);
 
-                    // Reset du formulaire en cas de succès
                     resetForm();
                     
-                    setSuccessMessage('Inscription réussie ! Bienvenue ' + result.data.user.name);
+                    alert('Inscription réussie ! Bienvenue ' + result.data.user.name);
 
                     // Redirection ou autre action après inscription réussie
                     // Par exemple: navigate('/dashboard') avec React Router
@@ -41,7 +50,7 @@ export default function Register() {
                     setApiError(result.error);
                 }
             } catch (err) {
-                setApiError('Une erreur inattendue s\'est produite');
+                alert('Une erreur inattendue s\'est produite');
                 console.error('Erreur inscription:', err);
             } finally {
                 setSubmitting(false);
@@ -96,37 +105,13 @@ export default function Register() {
 
                         <Button
                             onClick={formik.handleSubmit}
+                            type='submit'
                             disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
                             className="w-full"
                             size="lg"
                         >
-                            {formik.isSubmitting ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Inscription en cours...
-                                </>
-                            ) : (
-                                'S\'inscrire'
-                            )}
+                            S'inscrire
                         </Button>
-
-                        {apiError && (
-                            <Alert variant="destructive">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>
-                                    {apiError}
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
-                        {successMessage && (
-                            <Alert className="border-green-200 bg-green-50">
-                                <AlertCircle className="h-4 w-4 text-green-600" />
-                                <AlertDescription className="text-green-800">
-                                    {successMessage}
-                                </AlertDescription>
-                            </Alert>
-                        )}
                     </div>
                     
                     <div className="mt-6 text-center">

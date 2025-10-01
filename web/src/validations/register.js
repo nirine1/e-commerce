@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+
 export const validationSchema = Yup.object({
     name: Yup.string()
         .min(2, 'Le nom doit contenir au moins 2 caractères')

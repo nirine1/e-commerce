@@ -1,4 +1,7 @@
-const FormField = ({ label, type = 'text', formik, name, placeholder, ...props }) => {
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+
+export const FormField = ({ label, type = 'text', formik, name, placeholder, ...props }) => {
     const hasError = formik.touched[name] && formik.errors[name];
     
     return (
