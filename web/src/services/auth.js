@@ -17,4 +17,29 @@ export const authService = {
             };
         }
     },
+    login: async (userData) => {
+        try {
+            const { data } = await apiClient.post('/login', {
+                email: userData.email,
+                password: userData.password,
+            });
+            return { success: true, data };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Erreur lors de la connexion'
+            };
+        }
+    },
+    logout: async (userData) => {
+        try {
+            const { data } = await apiClient.post('/logout', {});
+            return { success: true, data };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Erreur lors de la déconnexion'
+            };
+        }
+    },
 }

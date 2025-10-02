@@ -3,9 +3,12 @@ import axios from 'axios';
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
     headers: {
-        'Context-Type': 'application/json',
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
-    }
+        'X-Requested-With': 'XMLHttpRequest',
+    },
+    withCredentials: true,
+    withXSRFToken: true,
 });
 
 apiClient.interceptors.request.use(config => {
@@ -15,6 +18,12 @@ apiClient.interceptors.request.use(config => {
     }
     return config;
 });
+
+export const getCsrfCookie = async () => {
+    await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/sanctum/csrf-cookie`, {
+        withCredentials: true
+    });
+};
 
 export default apiClient;
 
