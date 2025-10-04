@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link } from 'react-router-dom';
-import { useFormik } from 'formik';
-import { validationSchema } from "../../validations/login";
-import { Button } from '@/components/ui/button';
+import { Link } from "react-router-dom";
+import { useFormik } from "formik";
+import { validationSchema } from "../../validations/forgot-password";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
     Card,
@@ -18,14 +18,13 @@ import { FormField } from "../../components/form-field";
 import { authService } from "../../services/auth";
 import { tokenService } from "../../services/token";
 
-export default function Login() {
+export default function ForgotPassword() {
     const [apiError, setApiError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
     const formik = useFormik({
         initialValues: {
             email: '',
-            password: '',
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
@@ -33,9 +32,8 @@ export default function Login() {
             setSuccessMessage('');
 
             try {
-                const result = await authService.login({
+                const result = await authService.forgotPassword({
                     email: values.email,
-                    password: values.password,
                 });
 
                 if (result.success) {
@@ -43,8 +41,7 @@ export default function Login() {
 
                     resetForm();
 
-                    alert('Connexion réussie ! Bienvenue ' + result.data.user.name);
-
+                    setSuccessMessage('Un email a été envoyé à ' + values.email)
                     // Redirection ou autre action après connexion réussie
                     // Par exemple: navigate('/dashboard') avec React Router
 
@@ -65,14 +62,20 @@ export default function Login() {
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center">
-                        Connexion
+                        Mot de passe oublié ?
                     </CardTitle>
                     <p className="text-sm text-muted-foreground text-center">
-                        Connectez-vous pour commencer
+                        Pas de soucis, nous vous enverrons un email
                     </p>
                 </CardHeader>
 
                 <CardContent>
+                    {successMessage && (
+                        <Alert className="mb-4">
+                            <AlertDescription>{successMessage}</AlertDescription>
+                        </Alert>
+                    )}
+
                     {apiError && (
                         <Alert variant="destructive" className="mb-4">
                             <AlertDescription>{apiError}</AlertDescription>
@@ -88,22 +91,6 @@ export default function Login() {
                             formik={formik}
                         />
 
-                        <FormField
-                            name="password"
-                            type="password"
-                            label="Mot de passe"
-                            placeholder="Entrez votre mot de passe"
-                            formik={formik}
-                        />
-
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                <Link to="/forgot-password" className="font-medium text-primary hover:underline">
-                                    Mot de passe oublié ?
-                                </Link>
-                            </p>
-                        </div>
-
                         <Button
                             onClick={formik.handleSubmit}
                             type='submit'
@@ -112,15 +99,15 @@ export default function Login() {
                             size="lg"
                         >
                             {formik.isSubmitting && <Spinner />}
-                            Se connecter
+                            Réinitialiser le mot de passe
                         </Button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-muted-foreground">
-                            Pas encore de compte ?{' '}
-                            <Link to="/register" className="font-medium text-primary hover:underline">
-                                S'inscrire
+                            Retour à la {' '}
+                            <Link to="/login" className="font-medium text-primary hover:underline">
+                                connexion
                             </Link>
                         </p>
                     </div>

@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { Link } from 'react-router-dom';
-import { useFormik } from 'formik';
-import { validationSchema } from "../../validations/login";
-import { Button } from '@/components/ui/button';
-import { Spinner } from "@/components/ui/spinner";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useFormik } from "formik";
+import { validationSchema } from "../../validations/reset-password";
 import {
     Card,
     CardContent,
@@ -14,18 +12,28 @@ import {
     Alert,
     AlertDescription
 } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { FormField } from "../../components/form-field";
 import { authService } from "../../services/auth";
 import { tokenService } from "../../services/token";
 
-export default function Login() {
-    const [apiError, setApiError] = useState('');
+const searchParams = new URLSearchParams(window.location.search);
+const validForm = searchParams.has('email') && searchParams.has('token');
+
+export default function Register() {
+    const [apiError, setApiError] = useState(!validForm ? 'Lien invalide' : '');
     const [successMessage, setSuccessMessage] = useState('');
+    const [countDown, setCountDown] = useState(4);
+
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
-            email: '',
+            email: searchParams.get('email'),
+            token: searchParams.get('token'),
             password: '',
+            passwordConfirmation: ''
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
@@ -33,9 +41,11 @@ export default function Login() {
             setSuccessMessage('');
 
             try {
-                const result = await authService.login({
+                const result = await authService.resetPassword({
                     email: values.email,
+                    token: values.token,
                     password: values.password,
+                    passwordConfirmation: values.passwordConfirmation
                 });
 
                 if (result.success) {
@@ -43,17 +53,26 @@ export default function Login() {
 
                     resetForm();
 
-                    alert('Connexion réussie ! Bienvenue ' + result.data.user.name);
+                    useEffect(() => {
+                        if (countDown > 0) {
+                            const timer = setInterval(() => {
+                                setCountDown(prev => prev - 1);
+                            }, 1000);
 
-                    // Redirection ou autre action après connexion réussie
-                    // Par exemple: navigate('/dashboard') avec React Router
+                            setSuccessMessage(`Nouveau mot de passe enregistré ! Vous allez être redirigé vers la page de connexion dans ${countDown}s`);
+
+                            return () => clearInterval(timer);
+                        } else if (countDown === 0) {
+                            navigate("/login");
+                        }
+                    }, [countDown, navigate]);
 
                 } else {
                     setApiError(result.error);
                 }
             } catch (err) {
                 alert('Une erreur inattendue s\'est produite');
-                console.error('Erreur connexion:', err);
+                console.error('Erreur inscription:', err);
             } finally {
                 setSubmitting(false);
             }
@@ -65,14 +84,20 @@ export default function Login() {
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center">
-                        Connexion
+                        Réinitialiser mon mot de passe
                     </CardTitle>
                     <p className="text-sm text-muted-foreground text-center">
-                        Connectez-vous pour commencer
+                        Veuillez entrer votre nouveau mot de passe
                     </p>
                 </CardHeader>
 
                 <CardContent>
+                    {successMessage && (
+                        <Alert className="mb-4">
+                            <AlertDescription>{successMessage}</AlertDescription>
+                        </Alert>
+                    )}
+
                     {apiError && (
                         <Alert variant="destructive" className="mb-4">
                             <AlertDescription>{apiError}</AlertDescription>
@@ -82,27 +107,33 @@ export default function Login() {
                     <form className="space-y-4" onSubmit={formik.handleSubmit}>
                         <FormField
                             name="email"
-                            type="email"
-                            label="Adresse email"
-                            placeholder="nom@exemple.com"
+                            type="hidden"
+                            formik={formik}
+                        />
+
+                        <FormField
+                            name="token"
+                            type="hidden"
                             formik={formik}
                         />
 
                         <FormField
                             name="password"
                             type="password"
+                            disabled={!validForm}
                             label="Mot de passe"
-                            placeholder="Entrez votre mot de passe"
+                            placeholder="Créez un mot de passe sécurisé"
                             formik={formik}
                         />
 
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                <Link to="/forgot-password" className="font-medium text-primary hover:underline">
-                                    Mot de passe oublié ?
-                                </Link>
-                            </p>
-                        </div>
+                        <FormField
+                            name="passwordConfirmation"
+                            type="password"
+                            disabled={!validForm}
+                            label="Confirmer le mot de passe"
+                            placeholder="Confirmez votre mot de passe"
+                            formik={formik}
+                        />
 
                         <Button
                             onClick={formik.handleSubmit}
@@ -112,18 +143,9 @@ export default function Login() {
                             size="lg"
                         >
                             {formik.isSubmitting && <Spinner />}
-                            Se connecter
+                            Changer mon mot de passe
                         </Button>
                     </form>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Pas encore de compte ?{' '}
-                            <Link to="/register" className="font-medium text-primary hover:underline">
-                                S'inscrire
-                            </Link>
-                        </p>
-                    </div>
                 </CardContent>
             </Card>
         </div>
