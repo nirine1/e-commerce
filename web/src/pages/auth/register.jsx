@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { FormField } from "../../components/form-field";
 import { authService } from "../../services/auth";
 import { tokenService } from "../../services/token";
+import { Link } from 'react-router-dom';
 
 export default function Register() {
     const [apiError, setApiError] = useState('');
@@ -117,13 +118,9 @@ export default function Register() {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-muted-foreground">
                             Déjà un compte ?{' '}
-                            <button 
-                                type="button"
-                                className="font-medium text-primary hover:underline"
-                                onClick={() => console.log('Redirect to login')}
-                            >
+                            <Link to="/login" className="font-medium text-primary hover:underline">
                                 Se connecter
-                            </button>
+                            </Link>
                         </p>
                     </div>
                 </CardContent>
