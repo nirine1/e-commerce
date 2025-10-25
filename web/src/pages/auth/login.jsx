@@ -15,49 +15,29 @@ import {
     AlertDescription
 } from "@/components/ui/alert";
 import { FormField } from "../../components/form-field";
-import { authService } from "../../services/auth";
-import { tokenService } from "../../services/token";
+import { useAuth } from "../../contexts/auth";
 
 export default function Login() {
+    const { login } = useAuth();
+
     const [apiError, setApiError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
     const formik = useFormik({
-        initialValues: {
-            email: '',
-            password: '',
-        },
+        initialValues: { email: '', password: '' },
         validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
             setApiError('');
-            setSuccessMessage('');
-
             try {
-                const result = await authService.login({
-                    email: values.email,
-                    password: values.password,
-                });
-
-                if (result.success) {
-                    tokenService.setToken(result.data.token);
-
-                    resetForm();
-
-                    alert('Connexion réussie ! Bienvenue ' + result.data.user.name);
-
-                    // Redirection ou autre action après connexion réussie
-                    // Par exemple: navigate('/dashboard') avec React Router
-
-                } else {
-                    setApiError(result.error);
-                }
+                await login(values.email, values.password);
+                resetForm();
+                navigate("/dashboard");
             } catch (err) {
-                alert('Une erreur inattendue s\'est produite');
-                console.error('Erreur connexion:', err);
+                setApiError(err.message || "Erreur de connexion");
             } finally {
                 setSubmitting(false);
             }
-        }
+        },
     });
 
     return (

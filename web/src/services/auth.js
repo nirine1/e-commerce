@@ -74,4 +74,15 @@ export const authService = {
             };
         }
     },
+    user: async () => {
+        try {
+            const { data } = await apiClient.get('/user');
+            return { success: true, data };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Erreur lors de la récupération de l\'utilisateur'
+            };
+        }
+    }
 }

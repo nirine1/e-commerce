@@ -55,4 +55,11 @@ class AuthController extends Controller
             'message' => 'Déconnecté avec succès'
         ], Response::HTTP_OK);
     }
+
+    public function user(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()
+        ], Response::HTTP_OK);
+    }
 }
