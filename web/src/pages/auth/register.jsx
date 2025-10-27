@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "../../components/ui/card"
 import { Button } from '@/components/ui/button'
 import { FormField } from "../../components/form-field";
 import { authService } from "../../services/auth";
