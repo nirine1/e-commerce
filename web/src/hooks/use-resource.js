@@ -1,6 +1,6 @@
 import { use } from 'react';
 
-export function useResource(promiseOrFunction) {
+const useResource = (promiseOrFunction) => {
     const promise = typeof promiseOrFunction === 'function'
         ? promiseOrFunction()
         : promiseOrFunction;
@@ -9,3 +9,5 @@ export function useResource(promiseOrFunction) {
         return use(promise); 
     };
 }
+
+export { useResource };

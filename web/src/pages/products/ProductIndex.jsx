@@ -1,14 +1,13 @@
-import React from 'react'
 import ResourceList from '../../components/ResourceList'
 import { productService } from '../../services/product'
+import ProductList from './ProductList'
 
 const ProductIndex = () => {
     return (
         <>
-            <div>ProductIndex</div>
             <ResourceList 
                 service={productService.fetchProducts}
-                renderItem={(product) => (<span>{product.name}</span>)}
+                renderItems={(items) => <ProductList items={items} />}
                 emptyMessage="Aucun produit trouvé."
                 loadingMessage="Chargement des produits..."
             />

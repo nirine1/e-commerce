@@ -14,7 +14,7 @@ import {
     Alert,
     AlertDescription
 } from "@/components/ui/alert";
-import { FormField } from "../../components/form-field";
+import { FormField } from "../../components/FormField";
 import { useAuth } from "../../contexts/auth";
 
 export default function Login() {

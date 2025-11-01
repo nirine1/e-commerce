@@ -1,12 +1,13 @@
 import React, { Suspense } from 'react'
 import ErrorBoundary from './ErrorBoundary';
 import { useResource } from '../hooks/use-resource';
+import { Spinner } from "@/components/ui/spinner";
 
 const ResourceList = ({
     service, 
-    renderItem,
-    emptyMessage = "No resources found.",
-    loadingMessage = "Loading resources..."
+    renderItems,
+    emptyMessage = "Aucune ressource trouvée.",
+    loadingMessage = "Chargement des ressources..."
 }) => {
     const getResource = useResource(service);
 
@@ -18,19 +19,20 @@ const ResourceList = ({
         }
 
         return (
-            <ul>
-                {items.map(item => (
-                    <li key={item.id}>
-                        {renderItem(item)}
-                    </li>
-                ))}
-            </ul>
+            renderItems(items)
         );
     }
 
+    const LoadingMessage = () => (
+        <div className="flex items-center justify-center p-4">
+            <Spinner className="mr-2 h-4 w-4 text-blue-500" />
+            {loadingMessage}
+        </div>
+    );
+
     return (
         <ErrorBoundary>
-            <Suspense fallback={<div>{loadingMessage}</div>}>
+            <Suspense fallback={<LoadingMessage />}>
                 <ListContent />
             </Suspense>
         </ErrorBoundary>
