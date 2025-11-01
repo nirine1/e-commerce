@@ -16,11 +16,11 @@ const AppRoutes = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/products" element={<ProductIndex />} />
                 </Route>
 
                 <Route element={<MainLayout isProtected={true} />}>
                     <Route path="/" element={<TestComponent />} />
-                    <Route path="/products" element={<ProductIndex />} />
                 </Route>
             </Routes>
         </BrowserRouter>
