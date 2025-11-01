@@ -233,23 +233,23 @@
                 ]
             }
         },
-        "/categories/{id}": {
+        "/categories/{id_or_slug}": {
             "get": {
                 "tags": [
                     "Categories"
                 ],
                 "summary": "Get a single category",
-                "description": "Get detailed information about a specific category",
-                "operationId": "get-category-by-id",
+                "description": "Get detailed information about a specific category by ID or slug",
+                "operationId": "get-category-by-id-or-slug",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Category ID",
+                        "description": "Category ID or slug (e.g., '1' or 'electronics')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": "electronics"
                         }
                     }
                 ],
@@ -279,17 +279,17 @@
                     "Categories"
                 ],
                 "summary": "Update a category",
-                "description": "Update an existing category (requires authentication)",
+                "description": "Update an existing category by ID or slug (requires authentication)",
                 "operationId": "update-category",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Category ID",
+                        "description": "Category ID or slug (e.g., '1' or 'electronics')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": "electronics"
                         }
                     }
                 ],
@@ -356,17 +356,17 @@
                     "Categories"
                 ],
                 "summary": "Delete a category",
-                "description": "Delete an existing category (requires authentication). Cannot delete if category has children or products.",
+                "description": "Delete an existing category by ID or slug (requires authentication). Cannot delete if category has children or products.",
                 "operationId": "delete-category",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Category ID",
+                        "description": "Category ID or slug (e.g., '1' or 'electronics')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": "electronics"
                         }
                     }
                 ],
@@ -421,17 +421,17 @@
                     "Categories"
                 ],
                 "summary": "Partially update a category",
-                "description": "Partially update an existing category (requires authentication)",
+                "description": "Partially update an existing category by ID or slug (requires authentication)",
                 "operationId": "patch-category",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Category ID",
+                        "description": "Category ID or slug (e.g., '1' or 'electronics')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": "electronics"
                         }
                     }
                 ],
@@ -830,23 +830,31 @@
                 ]
             }
         },
-        "/products/{id}": {
+        "/products/{id_or_slug}": {
             "get": {
                 "tags": [
                     "Products"
                 ],
                 "summary": "Get a single product",
-                "description": "Get detailed information about a specific product",
-                "operationId": "get-product-by-id",
+                "description": "Get detailed information about a specific product by ID or slug",
+                "operationId": "get-product-by-id-or-slug",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Product ID",
+                        "description": "Product ID or slug (e.g., 1 or 'macbook-pro-16')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                {
+                                    "type": "string",
+                                    "example": "macbook-pro-16"
+                                }
+                            ]
                         }
                     }
                 ],
@@ -876,17 +884,25 @@
                     "Products"
                 ],
                 "summary": "Update a product",
-                "description": "Update an existing product (requires authentication)",
+                "description": "Update an existing product by ID or slug (requires authentication)",
                 "operationId": "update-product",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Product ID",
+                        "description": "Product ID or slug (e.g., 1 or 'macbook-pro-16')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                {
+                                    "type": "string",
+                                    "example": "macbook-pro-16"
+                                }
+                            ]
                         }
                     }
                 ],
@@ -971,17 +987,25 @@
                     "Products"
                 ],
                 "summary": "Delete a product",
-                "description": "Delete an existing product (requires authentication)",
+                "description": "Delete an existing product by ID or slug (requires authentication)",
                 "operationId": "delete-product",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Product ID",
+                        "description": "Product ID or slug (e.g., 1 or 'macbook-pro-16')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                {
+                                    "type": "string",
+                                    "example": "macbook-pro-16"
+                                }
+                            ]
                         }
                     }
                 ],
@@ -1020,17 +1044,25 @@
                     "Products"
                 ],
                 "summary": "Partially update a product",
-                "description": "Partially update an existing product (requires authentication)",
+                "description": "Partially update an existing product by ID or slug (requires authentication)",
                 "operationId": "patch-product",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id_or_slug",
                         "in": "path",
-                        "description": "Product ID",
+                        "description": "Product ID or slug (e.g., 1 or 'macbook-pro-16')",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                {
+                                    "type": "string",
+                                    "example": "macbook-pro-16"
+                                }
+                            ]
                         }
                     }
                 ],
