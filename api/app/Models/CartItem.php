@@ -9,7 +9,17 @@ class CartItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['cart_id','product_id','quantity','price'];
+    protected $fillable = ['cart_id', 'product_id', 'quantity', 'price'];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'cart_id' => 'integer',
+        'product_id' => 'integer',
+        'quantity' => 'integer',
+        'price' => 'decimal:2',
+    ];
 
     public function cart()
     {

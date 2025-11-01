@@ -9,7 +9,16 @@ class ProductImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id','image_path','alt_text','sort_order','is_primary'];
+    protected $fillable = ['product_id', 'image_path', 'alt_text', 'sort_order', 'is_primary'];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'product_id' => 'integer',
+        'sort_order' => 'integer',
+        'is_primary' => 'boolean',
+    ];
 
     public function product()
     {

@@ -9,7 +9,18 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id','product_id','quantity','price','total','product_name','product_sku'];
+    protected $fillable = ['order_id', 'product_id', 'quantity', 'price', 'total', 'product_name', 'product_sku'];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'order_id' => 'integer',
+        'product_id' => 'integer',
+        'quantity' => 'integer',
+        'price' => 'decimal:2',
+        'total' => 'decimal:2',
+    ];
 
     public function order()
     {

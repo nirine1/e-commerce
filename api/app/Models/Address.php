@@ -10,9 +10,26 @@ class Address extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'type', 'first_name', 'last_name', 'company',
-        'address_line_1', 'address_line_2', 'city', 'state',
-        'postal_code', 'country', 'is_default'
+        'user_id',
+        'type',
+        'first_name',
+        'last_name',
+        'company',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+        'is_default'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'user_id' => 'integer',
+        'is_default' => 'boolean',
     ];
 
     public function user()
