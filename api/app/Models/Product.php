@@ -9,11 +9,54 @@ class Product extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * Note: slug is auto-generated from name
+     * Note: cost_price is internal data, not mass assignable
+     */
     protected $fillable = [
-        'name','slug','description','short_description','sku',
-        'price','compare_price','cost_price','quantity','min_quantity',
-        'weight','dimensions_length','dimensions_width','dimensions_height',
-        'is_active','is_featured','meta_title','meta_description'
+        'name',
+        'description',
+        'short_description',
+        'sku',
+        'price',
+        'compare_price',
+        'quantity',
+        'min_quantity',
+        'weight',
+        'dimensions_length',
+        'dimensions_width',
+        'dimensions_height',
+        'is_active',
+        'is_featured',
+        'meta_title',
+        'meta_description'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     * cost_price is internal data not exposed to public
+     */
+    protected $hidden = [
+        'cost_price',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'price' => 'decimal:2',
+        'compare_price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
+        'weight' => 'decimal:2',
+        'dimensions_length' => 'decimal:2',
+        'dimensions_width' => 'decimal:2',
+        'dimensions_height' => 'decimal:2',
+        'quantity' => 'integer',
+        'min_quantity' => 'integer',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
     ];
 
     // Relations
