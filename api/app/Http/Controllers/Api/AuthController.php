@@ -15,11 +15,11 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = $request->password; // Auto Hashed
+        $user->save();
 
         $token = $user->createToken('api-token')->plainTextToken;
 

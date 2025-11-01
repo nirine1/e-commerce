@@ -9,7 +9,14 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','session_id'];
+    protected $fillable = ['user_id', 'session_id'];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'user_id' => 'integer',
+    ];
 
     public function user()
     {
