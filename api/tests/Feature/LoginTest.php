@@ -26,16 +26,16 @@ class LoginTest extends TestCase
         $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'user' => [
-                         'id',
-                         'name',
-                         'email',
-                         'created_at',
-                         'updated_at'
-                     ],
-                     'token'
-                 ]);
+            ->assertJsonStructure([
+                'user' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at',
+                    'updated_at'
+                ],
+                'token'
+            ]);
 
         $this->assertEquals($user->id, $response->json('user.id'));
         $this->assertEquals($user->email, $response->json('user.email'));
@@ -57,7 +57,7 @@ class LoginTest extends TestCase
         $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_login_fails_with_invalid_password(): void
@@ -75,7 +75,7 @@ class LoginTest extends TestCase
         $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_login_fails_with_missing_email(): void
@@ -87,7 +87,7 @@ class LoginTest extends TestCase
         $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_login_fails_with_missing_password(): void
@@ -99,7 +99,7 @@ class LoginTest extends TestCase
         $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['password']);
+            ->assertJsonValidationErrors(['password']);
     }
 
     public function test_user_can_logout_successfully(): void
@@ -116,9 +116,9 @@ class LoginTest extends TestCase
         ])->postJson('/api/logout');
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'message' => 'Déconnecté avec succès'
-                 ]);
+            ->assertJson([
+                'message' => 'Déconnecté avec succès'
+            ]);
 
         // Verify token has been deleted
         $this->assertDatabaseMissing('personal_access_tokens', [
@@ -148,13 +148,13 @@ class LoginTest extends TestCase
         ])->getJson('/api/user');
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'user' => [
-                         'id' => $user->id,
-                         'name' => $user->name,
-                         'email' => $user->email,
-                     ]
-                 ]);
+            ->assertJson([
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ]
+            ]);
     }
 
     public function test_user_endpoint_fails_without_authentication(): void
