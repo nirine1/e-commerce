@@ -1,51 +1,48 @@
-import { useCallback, useMemo, useState } from "react";
-import ProductCard from "./ProductCard";
-import ProductSearch from "./ProductSearch";
-import CustomPagination from "../../components/CustomPagination";
-import { productService } from "../../services/product";
+import { useCallback } from 'react';
+import ProductCard from './ProductCard';
+import CustomPagination from '../../components/CustomPagination';
+import ProductSearchBar from './ProductSearchBar';
+import ProductFilter from './ProductFilter';
+import { useProductFilters } from '../../hooks/use-product-filter';
+import { buildFilterParams } from '../../utils/common-utils';
 
 const ProductList = ({ items }) => {
-    const [newItems, setNewItems] = useState(items.data.data);
-    const [currentPage, setCurrentPage] = useState(1);
-    const searchProduct = (query) => {
-        productService.fetchProducts({search: query}).then(response => {
-            if(response.success) {
-                setNewItems(response.data.data);
-                setCurrentPage(1);
-            }
-        });
-    }
+    const { products, currentPage, totalPages, updateProducts } = 
+        useProductFilters(items.data);
 
-    const onPageChange = (page) => {
-        productService.fetchProducts({page: page}).then(response => {
-            if(response.success) {
-                setNewItems(response.data.data);
-                setCurrentPage(response.data.meta.current_page);
-            }
-        });
-    }
+    const handleSearch = useCallback((query) => {
+        updateProducts({ search: query, page: 1 });
+    }, [updateProducts]);
 
-    const totalPages = useMemo(() => {
-        return Math.ceil(items.data.meta.total / items.data.meta.per_page);
-    }, [newItems]);
-    
+    const handleFilter = useCallback((filters) => {
+        const params = buildFilterParams(filters);
+        params.page = 1;
+        updateProducts(params);
+    }, [updateProducts]);
+
+    const handlePageChange = useCallback((page) => {
+        updateProducts({ page });
+    }, [updateProducts]);
+
     return (
         <div className="flex flex-col gap-6">
             <CustomPagination 
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={onPageChange}
+                onPageChange={handlePageChange}
             />
-            <ProductSearch 
-                onSearch={searchProduct}
-            />
+            
+            <ProductFilter onFilter={handleFilter} />
+            
+            <ProductSearchBar onSearch={handleSearch} />
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {newItems.map((product) => (
+                {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ProductList;

@@ -2,15 +2,9 @@ import apiClient from "./api-client";
 import { getCsrfCookie } from "./api-client";
 
 export const productService = {
-    fetchProducts: async ({ page, search = '' } = {}) => {
+    fetchProducts: async (params) => {
         try {
-            const params = [];
-            if (page) params.push(`page=${page}`);
-            if (search) params.push(`search=${encodeURIComponent(search)}`);
-
-            const queryString = params.length ? `?${params.join('&')}` : '';
-            const { data } = await apiClient.get(`/products${queryString}`);
-
+            const { data } = await apiClient.get(`/products`, {params});
             return { success: true, data };
         } catch (error) {
             return {

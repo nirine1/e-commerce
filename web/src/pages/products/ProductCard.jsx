@@ -28,13 +28,13 @@ const ProductCard = ({ product }) => {
                         <DollarSign size={16} /> {product.price.toFixed(2)}
                     </div>
                     <div className="flex items-center gap-1 text-gray-500 text-sm">
-                        <PackageCheck size={16} /> {product.quantity} in stock
+                        <PackageCheck size={16} /> {product.quantity} en stock
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2 mt-3">
                     <button className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex justify-center items-center gap-2">
-                        <Tag size={16} /> Buy Now
+                        <Tag size={16} /> Ajouter dans le panier
                     </button>
                 </div>
             </div>
