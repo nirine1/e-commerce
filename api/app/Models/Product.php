@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
@@ -83,5 +84,23 @@ class Product extends Model
     public function wishlistedBy()
     {
         return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Product $product) {
+            if(!filled($product->slug)) {
+                $index = 0;
+                do {
+                    $slug = Str::slug($product->name);
+                    $slug = $index > 0 ? ($slug  . '-' . uniqid()) : $slug;
+                    $product->slug = $slug;
+                    $index++;
+                } while(Product::where('slug', $slug)->exists());
+            }
+        });
     }
 }

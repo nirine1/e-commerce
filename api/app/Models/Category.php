@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
 {
@@ -46,5 +47,23 @@ class Category extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'category_product')->withTimestamps();
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Category $category) {
+            if(!filled($category->slug)) {
+                $index = 0;
+                do {
+                    $slug = Str::slug($category->name);
+                    $slug = $index > 0 ? ($slug  . '-' . uniqid()) : $slug;
+                    $category->slug = $slug;
+                    $index++;
+                } while(Category::where('slug', $slug)->exists());
+            }
+        });
     }
 }
