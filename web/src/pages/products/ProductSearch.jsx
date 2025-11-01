@@ -1,11 +1,18 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Search } from 'lucide-react';
 
 const ProductSearch = ({ onSearch }) => {
     const [searchValue, setSearchValue] = useState('');
+    const debounceDelay = useRef(null);
     const handleKeyUp = useCallback((event) => {
-        onSearch(event.target.value);
+        if(debounceDelay.current) {
+            clearTimeout(debounceDelay.current);
+        }
+
+        debounceDelay.current = setTimeout(() => {
+            onSearch(event.target.value);
+        }, 300);
     }, [onSearch]);
 
     return (

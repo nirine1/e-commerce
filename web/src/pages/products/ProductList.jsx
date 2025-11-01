@@ -8,13 +8,16 @@ const ProductList = ({ items }) => {
     const [newItems, setNewItems] = useState(items.data.data);
     const [currentPage, setCurrentPage] = useState(1);
     const searchProduct = (query) => {
-        const filteredItems = items.data.data.filter(product => 
-            product.name.toLowerCase().includes(query.toLowerCase())
-        );
-        setNewItems(filteredItems);
+        productService.fetchProducts({search: query}).then(response => {
+            if(response.success) {
+                setNewItems(response.data.data);
+                setCurrentPage(1);
+            }
+        });
     }
+
     const onPageChange = (page) => {
-        productService.fetchProducts(page).then(response => {
+        productService.fetchProducts({page: page}).then(response => {
             if(response.success) {
                 setNewItems(response.data.data);
                 setCurrentPage(response.data.meta.current_page);
