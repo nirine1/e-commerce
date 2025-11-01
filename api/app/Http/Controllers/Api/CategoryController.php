@@ -107,15 +107,15 @@ class CategoryController extends Controller
         // Filter by parent (root categories if parent_id=null)
         if ($request->has('parent_id')) {
             if ($request->parent_id === 'null' || $request->parent_id === '') {
-                $query->whereNull('parent_id');
+                $query->whereNull('categories.parent_id');
             } else {
-                $query->where('parent_id', $request->parent_id);
+                $query->where('categories.parent_id', $request->parent_id);
             }
         }
 
         // Filter by active status
         if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
+            $query->where('categories.is_active', $request->boolean('is_active'));
         }
 
         // Include product counts
