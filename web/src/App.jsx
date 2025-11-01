@@ -7,6 +7,7 @@ import ResetPassword from './pages/auth/reset-password';
 import TestComponent from './components/test-component';
 import { AuthProvider } from './contexts/auth';
 import RouteLayout from './components/route-layout';
+import ProductIndex from './pages/products/ProductIndex';
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
 
                     <Route element={<RouteLayout isProtected={true} />}>
                         <Route path="/" element={<TestComponent />} />
+                        <Route path="/products" element={<ProductIndex />} />
                     </Route>
                 </Routes>
             </Router>
