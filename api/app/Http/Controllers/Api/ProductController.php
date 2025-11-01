@@ -152,44 +152,44 @@ class ProductController extends Controller
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('description', 'like', "%{$searchTerm}%")
-                  ->orWhere('sku', 'like', "%{$searchTerm}%");
+                $q->where('products.name', 'like', "%{$searchTerm}%")
+                  ->orWhere('products.description', 'like', "%{$searchTerm}%")
+                  ->orWhere('products.sku', 'like', "%{$searchTerm}%");
             });
         }
 
         // Filter by category
         if ($request->filled('category')) {
             $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('slug', $request->category)
-                  ->orWhere('id', $request->category);
+                $q->where('categories.slug', $request->category)
+                  ->orWhere('categories.id', $request->category);
             });
         }
 
         // Filter by active status
         if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
+            $query->where('products.is_active', $request->boolean('is_active'));
         }
 
         // Filter by featured
         if ($request->has('is_featured')) {
-            $query->where('is_featured', $request->boolean('is_featured'));
+            $query->where('products.is_featured', $request->boolean('is_featured'));
         }
 
         // Price range filter
         if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+            $query->where('products.price', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+            $query->where('products.price', '<=', $request->max_price);
         }
 
         // In stock filter
         if ($request->has('in_stock')) {
             if ($request->boolean('in_stock')) {
-                $query->where('quantity', '>', 0);
+                $query->where('products.quantity', '>', 0);
             } else {
-                $query->where('quantity', '<=', 0);
+                $query->where('products.quantity', '<=', 0);
             }
         }
 
