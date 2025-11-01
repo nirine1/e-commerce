@@ -18,15 +18,34 @@ import { FormField } from "../../components/form-field";
 import { authService } from "../../services/auth";
 import { tokenService } from "../../services/token";
 
-const searchParams = new URLSearchParams(window.location.search);
-const validForm = searchParams.has('email') && searchParams.has('token');
-
 export default function Register() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const validForm = searchParams.has('email') && searchParams.has('token');
+
     const [apiError, setApiError] = useState(!validForm ? 'Lien invalide' : '');
     const [successMessage, setSuccessMessage] = useState('');
     const [countDown, setCountDown] = useState(4);
+    const [resetSuccess, setResetSuccess] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (resetSuccess && countDown > 0) {
+            const timer = setInterval(() => {
+                setCountDown(prev => prev - 1);
+            }, 1000);
+
+            return () => clearInterval(timer);
+        } else if (resetSuccess && countDown === 0) {
+            navigate("/login");
+        }
+    }, [resetSuccess, countDown, navigate]);
+
+    useEffect(() => {
+        if (resetSuccess && countDown > 0) {
+            setSuccessMessage(`Nouveau mot de passe enregistré ! Vous allez être redirigé vers la page de connexion dans ${countDown}s`);
+        }
+    }, [countDown, resetSuccess]);
 
     const formik = useFormik({
         initialValues: {
@@ -52,20 +71,8 @@ export default function Register() {
                     tokenService.setToken(result.data.token);
 
                     resetForm();
-
-                    useEffect(() => {
-                        if (countDown > 0) {
-                            const timer = setInterval(() => {
-                                setCountDown(prev => prev - 1);
-                            }, 1000);
-
-                            setSuccessMessage(`Nouveau mot de passe enregistré ! Vous allez être redirigé vers la page de connexion dans ${countDown}s`);
-
-                            return () => clearInterval(timer);
-                        } else if (countDown === 0) {
-                            navigate("/login");
-                        }
-                    }, [countDown, navigate]);
+                    setResetSuccess(true);
+                    setSuccessMessage('Nouveau mot de passe enregistré ! Vous allez être redirigé vers la page de connexion dans 4s');
 
                 } else {
                     setApiError(result.error);

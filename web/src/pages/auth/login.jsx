@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { validationSchema } from "../../validations/login";
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { useAuth } from "../../contexts/auth";
 
 export default function Login() {
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     const [apiError, setApiError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
