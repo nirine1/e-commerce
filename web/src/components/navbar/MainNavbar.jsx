@@ -13,16 +13,17 @@ const MainNavbar = () => {
                 </Link>
 
                 <div className="flex space-x-6">
-                    <NavLink
-                        to="/"
-                        className={({ isActive }) =>
-                            isActive
-                                ? "text-blue-600 font-semibold"
-                                : "text-gray-600 hover:text-blue-600 transition-colors"
-                        }
-                    >
-                        Accueil
-                    </NavLink>
+                    {user && (
+                        <NavLink
+                            to="/"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "text-blue-600 font-semibold"
+                                    : "text-gray-600 hover:text-blue-600 transition-colors"
+                            }
+                            Accueil
+                        ></NavLink>
+                    )}
 
                     <NavLink
                         to="/products"
@@ -35,17 +36,21 @@ const MainNavbar = () => {
                         Produits
                     </NavLink>
 
-                    <div>
-                        <span className="mr-4 text-gray-800">Bonjour, {user.email}</span>
-                    </div>
-                    
-                    <button
-                        onClick={() => logout()}
-                        className="text-red-600 hover:text-red-800 transition-colors flex items-center gap-1"
-                    >
-                        Se déconnecter
-                        <LogOut className="mr-2 h-4 w-4" />
-                    </button>
+                    {user && (
+                        <>
+                            <div>
+                                <span className="mr-4 text-gray-800">Bonjour, {user.email}</span>
+                            </div>
+                            
+                            <button
+                                onClick={() => logout()}
+                                className="text-red-600 hover:text-red-800 transition-colors flex items-center gap-1"
+                            >
+                                Se déconnecter
+                                <LogOut className="mr-2 h-4 w-4" />
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         </nav>

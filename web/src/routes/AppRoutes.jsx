@@ -11,11 +11,14 @@ const AppRoutes = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route element={<MainLayout isProtected={false} />}>
+                <Route element={<MainLayout isAuth={true} />}>
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
+                </Route>
+
+                <Route element={<MainLayout isProtected={false} isAuth={false}/>}>
                     <Route path="/products" element={<ProductIndex />} />
                 </Route>
 
