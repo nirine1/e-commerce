@@ -202,17 +202,17 @@ class CategoryController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/categories/{id}",
-     *     operationId="get-category-by-id",
+     *     path="/categories/{id_or_slug}",
+     *     operationId="get-category-by-id-or-slug",
      *     tags={"Categories"},
      *     summary="Get a single category",
-     *     description="Get detailed information about a specific category",
+     *     description="Get detailed information about a specific category by ID or slug",
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Category ID",
+     *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="string", example="electronics")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -236,18 +236,18 @@ class CategoryController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/categories/{id}",
+     *     path="/categories/{id_or_slug}",
      *     operationId="update-category",
      *     tags={"Categories"},
      *     summary="Update a category",
-     *     description="Update an existing category (requires authentication)",
+     *     description="Update an existing category by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Category ID",
+     *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="string", example="electronics")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
@@ -270,18 +270,18 @@ class CategoryController extends Controller
      * )
      *
      * @OA\Patch(
-     *     path="/categories/{id}",
+     *     path="/categories/{id_or_slug}",
      *     operationId="patch-category",
      *     tags={"Categories"},
      *     summary="Partially update a category",
-     *     description="Partially update an existing category (requires authentication)",
+     *     description="Partially update an existing category by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Category ID",
+     *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="string", example="electronics")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
@@ -339,18 +339,18 @@ class CategoryController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/categories/{id}",
+     *     path="/categories/{id_or_slug}",
      *     operationId="delete-category",
      *     tags={"Categories"},
      *     summary="Delete a category",
-     *     description="Delete an existing category (requires authentication). Cannot delete if category has children or products.",
+     *     description="Delete an existing category by ID or slug (requires authentication). Cannot delete if category has children or products.",
      *     security={{"sanctum":{}}},
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Category ID",
+     *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="string", example="electronics")
      *     ),
      *     @OA\Response(
      *         response=200,

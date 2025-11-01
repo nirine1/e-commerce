@@ -293,17 +293,22 @@ class ProductController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/products/{id}",
-     *     operationId="get-product-by-id",
+     *     path="/products/{id_or_slug}",
+     *     operationId="get-product-by-id-or-slug",
      *     tags={"Products"},
      *     summary="Get a single product",
-     *     description="Get detailed information about a specific product",
+     *     description="Get detailed information about a specific product by ID or slug",
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Product ID",
+     *         description="Product ID or slug (e.g., 1 or 'macbook-pro-16')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(
+     *             oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *                 @OA\Schema(type="string", example="macbook-pro-16")
+     *             }
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -324,18 +329,23 @@ class ProductController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/products/{id}",
+     *     path="/products/{id_or_slug}",
      *     operationId="update-product",
      *     tags={"Products"},
      *     summary="Update a product",
-     *     description="Update an existing product (requires authentication)",
+     *     description="Update an existing product by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Product ID",
+     *         description="Product ID or slug (e.g., 1 or 'macbook-pro-16')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(
+     *             oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *                 @OA\Schema(type="string", example="macbook-pro-16")
+     *             }
+     *         )
      *     ),
      *     @OA\RequestBody(
      *         required=true,
@@ -361,18 +371,23 @@ class ProductController extends Controller
      * )
      *
      * @OA\Patch(
-     *     path="/products/{id}",
+     *     path="/products/{id_or_slug}",
      *     operationId="patch-product",
      *     tags={"Products"},
      *     summary="Partially update a product",
-     *     description="Partially update an existing product (requires authentication)",
+     *     description="Partially update an existing product by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Product ID",
+     *         description="Product ID or slug (e.g., 1 or 'macbook-pro-16')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(
+     *             oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *                 @OA\Schema(type="string", example="macbook-pro-16")
+     *             }
+     *         )
      *     ),
      *     @OA\RequestBody(
      *         required=true,
@@ -437,18 +452,23 @@ class ProductController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/products/{id}",
+     *     path="/products/{id_or_slug}",
      *     operationId="delete-product",
      *     tags={"Products"},
      *     summary="Delete a product",
-     *     description="Delete an existing product (requires authentication)",
+     *     description="Delete an existing product by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
      *     @OA\Parameter(
-     *         name="id",
+     *         name="id_or_slug",
      *         in="path",
-     *         description="Product ID",
+     *         description="Product ID or slug (e.g., 1 or 'macbook-pro-16')",
      *         required=true,
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(
+     *             oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *                 @OA\Schema(type="string", example="macbook-pro-16")
+     *             }
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
