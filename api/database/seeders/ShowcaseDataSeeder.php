@@ -510,13 +510,14 @@ class ShowcaseDataSeeder extends Seeder
         $this->command->info('🖼️  Seeding product images...');
 
         foreach ($products as $product) {
-            // 1-3 images per product
-            $imageCount = rand(1, 3);
+            // 1-6 images per product
+            $imageCount = rand(1, 6);
 
             for ($i = 0; $i < $imageCount; $i++) {
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => "products/{$product->slug}-" . ($i + 1) . ".jpg",
+                    // 'image_path' => "products/{$product->slug}-" . ($i + 1) . ".jpg",
+                    'image_path' => "seeds/product-sample-" . ($i + 1) . ".png",
                     'alt_text' => $product->name . " - Image " . ($i + 1),
                     'sort_order' => $i, // Set sort order to avoid unique constraint violation
                     'is_primary' => $i === 0, // First image is primary
