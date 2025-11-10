@@ -9,10 +9,8 @@ export const buildFilterParams = (filters) => {
         if (typeof value === 'string' && (value.includes('_asc') || value.includes('_desc'))) {
             cleanedFilters.sort_direction = value.includes('_asc') ? 'asc' : 'desc';
             cleanedFilters.sort_by = value.replace(/_asc|_desc/, '');
-            
-            delete cleanedFilters[key];
         }
-    });
+    }); 
 
     return cleanedFilters;
 };

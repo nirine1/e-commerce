@@ -1,10 +1,12 @@
-import { useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 import ProductCard from './ProductCard';
-import CustomPagination from '../../components/CustomPagination';
+import CustomPagination from '../CustomPagination';
 import ProductSearchBar from './ProductSearchBar';
 import ProductFilter from './ProductFilter';
 import { useProductFilters } from '../../hooks/use-product-filter';
 import { buildFilterParams } from '../../utils/common-utils';
+import ErrorBoundary from '../ErrorBoundary';
+import LoadingMessage from '../LoadingMessage';
 
 const ProductList = ({ items }) => {
     const { products, currentPage, totalPages, updateProducts } = 
@@ -36,11 +38,16 @@ const ProductList = ({ items }) => {
             
             <ProductSearchBar onSearch={handleSearch} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                ))}
-            </div>
+            <ErrorBoundary>
+                <Suspense fallback={<LoadingMessage message={"Chargement des produits"}/>}>
+                
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {products.map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))}
+                    </div>
+                </Suspense>
+            </ErrorBoundary>
         </div>
     );
 };

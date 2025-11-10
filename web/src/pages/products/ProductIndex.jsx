@@ -1,6 +1,6 @@
 import ResourceList from '../../components/ResourceList'
 import { productService } from '../../services/product'
-import ProductList from './ProductList'
+import ProductList from '../../components/products/ProductList'
 
 const ProductIndex = () => {
     return (

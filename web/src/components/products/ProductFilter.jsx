@@ -38,8 +38,10 @@ const ProductFilter = ({ onFilter }) => {
             sort_by: ''
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: (values, { setSubmitting }) => {
+            setSubmitting(true); 
             onFilter(values);
+            setSubmitting(false);
         },
     })
 
@@ -141,9 +143,9 @@ const ProductFilter = ({ onFilter }) => {
                             <X className="w-4 h-4 mr-1" />
                             Réinitialiser
                         </Button>
-                        <Button type="submit" size="sm">
+                        <Button type="submit" size="sm" disabled={formik.isSubmitting}>
                             <Check className="w-4 h-4 mr-1" />
-                            Appliquer
+                            {formik.isSubmitting ? 'Application...' : 'Appliquer'}
                         </Button>
                     </div>
                 </div>
