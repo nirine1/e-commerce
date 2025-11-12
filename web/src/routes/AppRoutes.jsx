@@ -6,6 +6,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import TestComponent from '../components/TestComponent';
 import ProductIndex from '../pages/products/ProductIndex';
+import ProductShow from '../pages/products/ProductShow';
 
 const AppRoutes = () => {
     return (
@@ -20,6 +21,7 @@ const AppRoutes = () => {
 
                 <Route element={<MainLayout isProtected={false} isAuth={false}/>}>
                     <Route path="/products" element={<ProductIndex />} />
+                    <Route path="/products/:slug" element={<ProductShow />} />
                 </Route>
 
                 <Route element={<MainLayout isProtected={true} />}>
