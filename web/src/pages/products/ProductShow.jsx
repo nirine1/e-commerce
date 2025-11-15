@@ -2,14 +2,17 @@ import { useParams } from "react-router"
 import { useResource } from "../../hooks/use-resource";
 import { productService } from "../../services/product";
 import ErrorBoundary from "../../components/ErrorBoundary";
-import { Suspense } from "react";
+import { Suspense, useMemo, useState } from "react";
 import LoadingMessage from "../../components/LoadingMessage";
 import { Button } from "../../components/ui/button";
 import { Badge } from "@/components/ui/badge"
 
 const ProductShow = () => {
     const params = useParams()
-    const getResource = useResource(productService.fetchProductById(params.slug));
+    const resource = useMemo(() => {
+        return productService.fetchProductById(params.slug);
+    }, [params.slug]);
+    const getResource = useResource(resource);
 
     const ShowProduct = () => {
         const product = getResource();
@@ -21,17 +24,23 @@ const ProductShow = () => {
         const productData = product.data.data;
 
         // Get primary image or first image
-        const primaryImage = productData.primary_image?.image_url ||
-            productData.images?.[0]?.image_url ||
-            "/placeholder.png";
+        const primaryImage = productData.primary_image ||
+            productData.images?.[0] ||
+            {
+                id: Math.floor(Math.random() * 100),
+                alt_text: productData.name,
+                image_url: '/placeholder.png'
+            };
 
-        // Get additional images (exclude primary)
-        const additionalImages = productData.images?.filter(img => !img.is_primary) || [];
+        // Get product images
+        const productImages = productData.images || [];
 
         // Check if product has dimensions
         const hasDimensions = productData.dimensions?.length ||
             productData.dimensions?.width ||
             productData.dimensions?.height;
+
+        const [currentImage, setCurrentImage] = useState(primaryImage);
 
         return (
             <div className="mx-auto">
@@ -40,17 +49,18 @@ const ProductShow = () => {
                     <div>
                         <div className="aspect-square overflow-hidden rounded-lg border">
                             <img
-                                src={primaryImage}
-                                alt={productData.primary_image?.alt_text || productData.name}
+                                src={currentImage.image_url}
+                                alt={currentImage.alt_text}
                                 className="h-full w-full object-cover"
                             />
                         </div>
-                        {additionalImages.length > 0 && (
-                            <div className="mt-4 grid grid-cols-4 gap-3">
-                                {additionalImages.slice(0, 4).map((img) => (
+                        {productImages.length > 0 && (
+                            <div className="mt-4 p-2 flex flex-row w-full gap-3 snap-x snap-mandatory scroll-smooth overflow-x-auto">
+                                {productImages.map((img) => (
                                     <button
                                         key={img.id}
-                                        className="aspect-square overflow-hidden rounded-lg border hover:ring-2 hover:ring-black"
+                                        className={`cursor-pointer aspect-square w-24 overflow-hidden rounded-lg border shrink-0 snap-center hover:ring-2 hover:ring-black ${(img.id === currentImage.id) ? "ring-2 ring-black" : ""}`}
+                                        onClick={() => setCurrentImage(img)}
                                     >
                                         <img
                                             src={img.image_url}
