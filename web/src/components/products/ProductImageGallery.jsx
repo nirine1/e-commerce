@@ -14,10 +14,12 @@ const ProductImageGallery = ({ primaryImage, productImages }) => {
             </div>
             {productImages.length > 0 && (
                 <div className="mt-4 p-2 flex flex-row w-full gap-3 snap-x snap-mandatory scroll-smooth overflow-x-auto">
-                    {productImages.map((img) => (
+                    {productImages.map((img, index) => (
                         <button
                             key={img.id}
                             className={`cursor-pointer aspect-square w-24 overflow-hidden rounded-lg border shrink-0 snap-center hover:ring-2 hover:ring-black ${(img.id === currentImage.id) ? "ring-2 ring-black" : ""}`}
+                            aria-label={`Voir l'image ${index + 1} sur ${productImages.length} du produit`}
+                            aria-current={ img.id === currentImage.id ? "true" : "false" }
                             onClick={() => setCurrentImage(img)}
                         >
                             <img
