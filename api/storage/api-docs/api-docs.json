@@ -313,7 +313,7 @@
                     "CartItem"
                 ],
                 "summary": "Add item to cart",
-                "description": "Adds a new item to the shopping cart (requires authentication or session ID for guests)",
+                "description": "Adds a new item to the shopping cart",
                 "operationId": "store-cart-item",
                 "requestBody": {
                     "required": true,
@@ -355,38 +355,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "cart_id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "product_id": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                },
-                                                "quantity": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                },
-                                                "price": {
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": 29.99
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/CartItem"
                                         }
                                     },
                                     "type": "object"
@@ -399,6 +368,71 @@
                     },
                     "404": {
                         "description": "Product not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/cart/items/{cartItem}": {
+            "put": {
+                "tags": [
+                    "CartItem"
+                ],
+                "summary": "Update cart item",
+                "description": "Update the quantity of an existing cart item",
+                "operationId": "update-cart-item",
+                "parameters": [
+                    {
+                        "name": "cartItem",
+                        "in": "path",
+                        "description": "ID of the cart item to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "quantity": {
+                                        "description": "New quantity for this cart item",
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cart item updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CartItem"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Cart item not found"
                     },
                     "422": {
                         "description": "Validation error"
@@ -1638,6 +1672,47 @@
                 },
                 "type": "object"
             },
+            "CartItem": {
+                "title": "Cart Item",
+                "description": "Cart item model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "cart_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "product_id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 19.99
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-11-21T10:30:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-11-21T11:00:00.000000Z"
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/Product"
+                    }
+                },
+                "type": "object"
+            },
             "Category": {
                 "title": "Category",
                 "description": "Category model",
@@ -1831,7 +1906,7 @@
         },
         {
             "name": "CartItem",
-            "description": "Shopping cart endpoints - manage cart items"
+            "description": "Shopping cart endpoints - manage cart items (requires authentication or session ID for guests)"
         },
         {
             "name": "Products",

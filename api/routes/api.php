@@ -41,6 +41,7 @@ Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
 // Cart Items
 Route::post('/cart/items', [CartController::class, 'store']);
+Route::put('/cart/items/{cartItem}', [CartController::class, 'update']);
 
 // ===================================
 // Protected Routes (Require Authentication)
