@@ -2,7 +2,7 @@ import { Tag, DollarSign, PackageCheck } from "lucide-react";
 
 const ProductCard = ({ product }) => {
     return (
-        <div className="max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+        <div className="max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer" onClick={() => window.location.href = `/products/${product.id}`}>
             <div className="relative">
                 <img
                     src={product.images?.[0]?.image_url || "https://www.basketpack.fr/wp-content/uploads/2022/04/comparatif-chaussures-basketball-peak-800x800-c-center.jpg"}
