@@ -307,7 +307,7 @@
                 ]
             }
         },
-        "/cart-items": {
+        "/cart/items": {
             "post": {
                 "tags": [
                     "CartItem"
@@ -1817,10 +1817,10 @@
         },
         "securitySchemes": {
             "sanctum": {
-                "type": "http",
-                "description": "Laravel Sanctum Bearer Token Authentication",
-                "bearerFormat": "Sanctum",
-                "scheme": "bearer"
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
             }
         }
     },
@@ -1840,6 +1840,11 @@
         {
             "name": "Categories",
             "description": "Product categories endpoints - hierarchical category management"
+        }
+    ],
+    "security": [
+        {
+            "sanctum": []
         }
     ]
 }

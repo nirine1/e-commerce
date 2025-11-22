@@ -38,6 +38,10 @@ Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
+
+// Cart Items
+Route::post('/cart/items', [CartController::class, 'store']);
+
 // ===================================
 // Protected Routes (Require Authentication)
 // ===================================
@@ -57,9 +61,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::patch('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
-
-    // Cart Items
-    Route::post('/cart-items', [CartController::class, 'store']);
+    
+    
 
     // TODO: Add routes for Cart, Orders, Addresses, etc.
 });

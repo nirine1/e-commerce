@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Http\Resources\CartItemResource;
+use Illuminate\Support\Facades\Session;
 
 /**
  * @OA\Tag(
@@ -20,7 +21,7 @@ class CartController extends Controller
 {
     /**
      * @OA\Post(
-     *    path="/cart-items",
+     *    path="/cart/items",
      *    operationId="store-cart-item",
      *    tags={"CartItem"},
      *    summary="Add item to cart",
@@ -68,7 +69,6 @@ class CartController extends Controller
      *       )
      *    ),
      *    @OA\Response(response=400, description="Bad request"),
-     *    @OA\Response(response=401, description="Unauthenticated"),
      *    @OA\Response(response=404, description="Product not found"),
      *    @OA\Response(response=422, description="Validation error")
      * )
@@ -80,8 +80,20 @@ class CartController extends Controller
             'session_id' => 'nullable|string'
         ]);
 
-        $sessionId = $request->session()->getId() ?? $request->input('session_id');
-        $userId = auth()->id();
+        if(auth()->id()) {
+            // Authenticated user
+            $request->merge(['session_id' => null]);
+        } else if($request->has('session_id')) {
+            // Guest user
+            if (!$request->has('session_id')) {
+                $request->merge(['session_id' => Session::getId()]);
+            }
+        } else {
+            return response()->json(['error' => 'Session ID is required for guest users'], 400);
+        }
+
+        $sessionId = $request->input('session_id');
+        $userId = auth()->id() ?? null;
 
         $cart = Cart::where(function($query) use ($sessionId, $userId) {
             if ($userId) {
@@ -91,6 +103,7 @@ class CartController extends Controller
             }
         })->first();
 
+        
         if (!$cart) {
             $cart = Cart::create([
                 'session_id' => $sessionId,
