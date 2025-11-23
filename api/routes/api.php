@@ -40,8 +40,16 @@ Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
 
 // Cart Items
-Route::post('/cart/items', [CartController::class, 'store']);
-Route::put('/cart/items/{cartItem}', [CartController::class, 'update']);
+Route::middleware('optional.auth')->group(function () {
+    Route::prefix('/cart')->group(function () {
+        Route::prefix('/items')->group(function () {
+            Route::post('/', [CartController::class, 'store']);
+            Route::put('/{cartItem}', [CartController::class, 'updateItem']);
+            Route::patch('/{cartItem}', [CartController::class, 'updateItem']);
+            Route::delete('/{cartItem}', [CartController::class, 'destroy']);
+        });
+    });
+});
 
 // ===================================
 // Protected Routes (Require Authentication)

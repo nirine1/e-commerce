@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+        $middleware->alias([
+            'optional.auth' => \App\Http\Middleware\OptionalAuth::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

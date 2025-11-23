@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Session;
 
 /**
  * @OA\Tag(
- *     name="CartItem",
+ *     name="Cart Item",
  *     description="Shopping cart endpoints - manage cart items (requires authentication or session ID for guests)"
  * )
  */
@@ -23,7 +23,7 @@ class CartController extends Controller
      * @OA\Post(
      *     path="/cart/items",
      *     operationId="store-cart-item",
-     *     tags={"CartItem"},
+     *     tags={"Cart Item"},
      *     summary="Add item to cart",
      *     description="Adds a new item to the shopping cart",
      *
@@ -76,34 +76,23 @@ class CartController extends Controller
             'session_id' => 'nullable|string'
         ]);
 
-        if(auth()->id()) {
-            // Authenticated user
+        // Set session_id to null if user is authenticated
+        if (auth()->id()) {
             $request->merge(['session_id' => null]);
         } else if($request->has('session_id')) {
-            // Guest user
-            if (!$request->has('session_id')) {
-                $request->merge(['session_id' => Session::getId()]);
-            }
+            $sessionId = $request->input('session_id');
+            $request->merge(['session_id' => $sessionId]);
         } else {
             return response()->json(['error' => 'Session ID is required for guest users'], 400);
         }
 
         $sessionId = $request->input('session_id');
-        $userId = auth()->id() ?? null;
-
-        $cart = Cart::where(function($query) use ($sessionId, $userId) {
-            if ($userId) {
-                $query->where('user_id', $userId);
-            } else {
-                $query->where('session_id', $sessionId);
-            }
-        })->first();
-
+        $cart = Cart::getUserCart($sessionId);
         
         if (!$cart) {
             $cart = Cart::create([
                 'session_id' => $sessionId,
-                'user_id' => $userId
+                'user_id' => auth()->id()
             ]);
         }
 
@@ -118,7 +107,7 @@ class CartController extends Controller
                                 ->first();
 
         if ($existingItem) {
-            $existingItem->quantity += $validated['quantity'];
+            $existingItem->quantity = $validated['quantity'];
             $existingItem->save();
             $cartItem = $existingItem;
         } else {
@@ -141,7 +130,7 @@ class CartController extends Controller
      * @OA\Put(
      *     path="/cart/items/{cartItem}",
      *     operationId="update-cart-item",
-     *     tags={"CartItem"},
+     *     tags={"Cart Item"},
      *     summary="Update cart item",
      *     description="Update the quantity of an existing cart item",
      *
@@ -178,15 +167,75 @@ class CartController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public function update(Request $request, CartItem $cartItem) {
+    public function updateItem(Request $request, CartItem $cartItem) {
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $validated['priece'] = $cartItem->product->price;
+        // Get cart of authenticated user or guest
+        $sessionId = $request->input('session_id') ?? null;
+        $cart = Cart::getUserCart($sessionId);
+        if (!$cart) {
+            return response()->json(['message' => 'Cart not found'], 404);
+        }
+        // Check if the cart item belongs to the user's cart
+        if ($cartItem->cart_id !== $cart->id) {
+            return response()->json(['message' => 'Cart item doesn\'t belong to the user authenticated'], 404);
+        }   
+        
+        $validated['price'] = $cartItem->product->price;
         $cartItem->update($validated);
 
         $cartItem->load(['product']);
         return new CartItemResource($cartItem);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/cart/items/{cartItem}",
+     *     operationId="delete-cart-item",
+     *     tags={"Cart Item"},
+     *     summary="Delete a Cart Item",
+     *     description="Delete an existing cart item by ID",
+     *     @OA\Parameter(
+     *         name="cartItem",
+     *         in="path",
+     *         description="Cart Item ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             oneOf={
+     *                 @OA\Schema(type="integer", example=1),
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Cart Item deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Cart Item deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Cart Item not found")
+     * )
+     */
+    public function destroy(Request $request, CartItem $cartItem) {
+        // Get cart of authenticated user or guest
+        $sessionId = $request->input('session_id') ?? null;
+        $cart = Cart::getUserCart($sessionId);
+        
+        if (!$cart) {
+            return response()->json(['message' => 'Cart not found'], 404);
+        }
+        
+        // Check if the cart item belongs to the user's cart
+        if ($cartItem->cart_id !== $cart->id) {
+            return response()->json(['message' => 'Cart item doesn\'t belong to the user authenticated'], 404);
+        }
+        
+        $cartItem->delete();
+        
+        return response()->json([
+            'message' => 'Cart Item deleted successfully'
+        ], 200);
     }
 }

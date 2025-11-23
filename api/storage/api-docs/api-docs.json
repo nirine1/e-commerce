@@ -310,7 +310,7 @@
         "/cart/items": {
             "post": {
                 "tags": [
-                    "CartItem"
+                    "Cart Item"
                 ],
                 "summary": "Add item to cart",
                 "description": "Adds a new item to the shopping cart",
@@ -378,7 +378,7 @@
         "/cart/items/{cartItem}": {
             "put": {
                 "tags": [
-                    "CartItem"
+                    "Cart Item"
                 ],
                 "summary": "Update cart item",
                 "description": "Update the quantity of an existing cart item",
@@ -436,6 +436,51 @@
                     },
                     "422": {
                         "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Cart Item"
+                ],
+                "summary": "Delete a Cart Item",
+                "description": "Delete an existing cart item by ID",
+                "operationId": "delete-cart-item",
+                "parameters": [
+                    {
+                        "name": "cartItem",
+                        "in": "path",
+                        "description": "Cart Item ID",
+                        "required": true,
+                        "schema": {
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "example": 1
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cart Item deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cart Item deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cart Item not found"
                     }
                 }
             }
@@ -1905,7 +1950,7 @@
             "description": "Authentication endpoints - manage user authentication"
         },
         {
-            "name": "CartItem",
+            "name": "Cart Item",
             "description": "Shopping cart endpoints - manage cart items (requires authentication or session ID for guests)"
         },
         {
