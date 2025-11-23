@@ -57,9 +57,8 @@ class CartController extends Controller
             $sessionId
         );
 
-        return CartItemResource::make($cartItem->load('product'))
-            ->response()
-            ->setStatusCode(201);
+        $cartItem->load('product');
+        return new CartItemResource($cartItem);
     }
 
     /**
@@ -102,7 +101,7 @@ class CartController extends Controller
             $request->validated('quantity')
         );
 
-        return CartItemResource::make($cartItem);
+        return new CartItemResource($cartItem);
     }
 
     /**
