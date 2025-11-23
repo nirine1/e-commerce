@@ -27,17 +27,4 @@ class Cart extends Model
     {
         return $this->hasMany(CartItem::class);
     }
-
-    public static function getUserCart($sessionId = null)
-    {
-        $userId = auth()->id();
-
-        return self::where(function($query) use ($userId, $sessionId) {
-            if ($userId) {
-                $query->where('user_id', $userId);
-            } else {
-                $query->where('session_id', $sessionId);
-            }
-        })->first();
-    }
 }

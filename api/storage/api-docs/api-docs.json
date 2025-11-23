@@ -326,17 +326,14 @@
                                 ],
                                 "properties": {
                                     "product_id": {
-                                        "description": "ID of the product to add",
                                         "type": "integer",
                                         "example": 1
                                     },
                                     "quantity": {
-                                        "description": "Quantity of the product to add",
                                         "type": "integer",
                                         "example": 2
                                     },
                                     "session_id": {
-                                        "description": "Session identifier for guest users",
                                         "type": "string",
                                         "example": "abc123xyz",
                                         "nullable": true
@@ -349,19 +346,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Cart item created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/CartItem"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Cart item created successfully"
                     },
                     "400": {
                         "description": "Bad request"
@@ -387,7 +372,6 @@
                     {
                         "name": "cartItem",
                         "in": "path",
-                        "description": "ID of the cart item to update",
                         "required": true,
                         "schema": {
                             "type": "integer",
@@ -402,9 +386,13 @@
                             "schema": {
                                 "properties": {
                                     "quantity": {
-                                        "description": "New quantity for this cart item",
                                         "type": "integer",
                                         "example": 3
+                                    },
+                                    "session_id": {
+                                        "type": "string",
+                                        "example": "abc123xyz",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -414,28 +402,13 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Cart item updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/CartItem"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Cart item updated successfully"
                     },
-                    "401": {
-                        "description": "Unauthenticated"
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "404": {
                         "description": "Cart item not found"
-                    },
-                    "422": {
-                        "description": "Validation error"
                     }
                 }
             },
@@ -443,35 +416,46 @@
                 "tags": [
                     "Cart Item"
                 ],
-                "summary": "Delete a Cart Item",
+                "summary": "Delete a cart item",
                 "description": "Delete an existing cart item by ID",
                 "operationId": "delete-cart-item",
                 "parameters": [
                     {
                         "name": "cartItem",
                         "in": "path",
-                        "description": "Cart Item ID",
                         "required": true,
                         "schema": {
-                            "oneOf": [
-                                {
-                                    "type": "integer",
-                                    "example": 1
-                                }
-                            ]
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "session_id": {
+                                        "type": "string",
+                                        "example": "abc123xyz",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Cart Item deleted successfully",
+                        "description": "Cart item deleted successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Cart Item deleted successfully"
+                                            "example": "Cart item deleted successfully"
                                         }
                                     },
                                     "type": "object"
@@ -479,8 +463,61 @@
                             }
                         }
                     },
+                    "403": {
+                        "description": "Forbidden"
+                    },
                     "404": {
-                        "description": "Cart Item not found"
+                        "description": "Cart item not found"
+                    }
+                }
+            }
+        },
+        "/cart": {
+            "delete": {
+                "tags": [
+                    "Cart Item"
+                ],
+                "summary": "Delete entire cart",
+                "description": "Delete the entire shopping cart with all items",
+                "operationId": "delete-cart",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "session_id": {
+                                        "type": "string",
+                                        "example": "abc123xyz",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cart deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cart deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Cart not found"
                     }
                 }
             }

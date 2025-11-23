@@ -46,8 +46,10 @@ Route::middleware('optional.auth')->group(function () {
             Route::post('/', [CartController::class, 'store']);
             Route::put('/{cartItem}', [CartController::class, 'updateItem']);
             Route::patch('/{cartItem}', [CartController::class, 'updateItem']);
-            Route::delete('/{cartItem}', [CartController::class, 'destroy']);
+            Route::delete('/{cartItem}', [CartController::class, 'destroyItem']);
         });
+
+        Route::delete('/', [CartController::class, 'destroy']);
     });
 });
 
