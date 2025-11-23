@@ -26,6 +26,31 @@ class CartController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/cart",
+     *     operationId="get-cart",
+     *     tags={"Cart Item"},
+     *     summary="Get user cart",
+     *     description="Retrieve the current user's shopping cart",
+     *     @OA\Parameter(
+     *         name="session_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string", example="abc123xyz")
+     *     ),
+     *     @OA\Response(response=200, description="Successful retrieval of cart"),
+     *     @OA\Response(response=400, description="Bad request"),
+     *     @OA\Response(response=404, description="Cart not found")
+     * )
+     */
+    public function index(Request $request): JsonResource
+    {
+        $sessionId = $request->input('session_id');
+
+        return $this->cartService->getUserCartResource($sessionId);
+    }
+    
+    /**
      * @OA\Post(
      *     path="/cart/items",
      *     operationId="store-cart-item",

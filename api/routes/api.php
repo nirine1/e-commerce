@@ -50,6 +50,7 @@ Route::middleware('optional.auth')->group(function () {
         });
 
         Route::delete('/', [CartController::class, 'destroy']);
+        Route::get('/', [CartController::class, 'index']);
     });
 });
 

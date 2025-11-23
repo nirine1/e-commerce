@@ -307,6 +307,86 @@
                 ]
             }
         },
+        "/cart": {
+            "get": {
+                "tags": [
+                    "Cart Item"
+                ],
+                "summary": "Get user cart",
+                "description": "Retrieve the current user's shopping cart",
+                "operationId": "get-cart",
+                "parameters": [
+                    {
+                        "name": "session_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "abc123xyz"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of cart"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Cart not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Cart Item"
+                ],
+                "summary": "Delete entire cart",
+                "description": "Delete the entire shopping cart with all items",
+                "operationId": "delete-cart",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "session_id": {
+                                        "type": "string",
+                                        "example": "abc123xyz",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cart deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cart deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Cart not found"
+                    }
+                }
+            }
+        },
         "/cart/items": {
             "post": {
                 "tags": [
@@ -468,56 +548,6 @@
                     },
                     "404": {
                         "description": "Cart item not found"
-                    }
-                }
-            }
-        },
-        "/cart": {
-            "delete": {
-                "tags": [
-                    "Cart Item"
-                ],
-                "summary": "Delete entire cart",
-                "description": "Delete the entire shopping cart with all items",
-                "operationId": "delete-cart",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "session_id": {
-                                        "type": "string",
-                                        "example": "abc123xyz",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Cart deleted successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Cart deleted successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Cart not found"
                     }
                 }
             }

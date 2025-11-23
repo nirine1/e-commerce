@@ -7,6 +7,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\CartResource;
 
 class CartService
 {
@@ -119,6 +120,17 @@ class CartService
                 $query->where('session_id', $sessionId);
             }
         })->first();
+    }
+
+    public function getUserCartResource(?string $sessionId)
+    {
+        $cart = $this->getUserCart($sessionId);
+        if( !$cart ) {
+            return null;
+        } else {
+            $cart->load('items');
+            return new CartResource($cart);
+        }
     }
 
 }
