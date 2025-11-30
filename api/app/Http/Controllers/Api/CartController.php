@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCartItemRequest;
 use App\Http\Requests\UpdateCartItemRequest;
 use App\Http\Resources\CartItemResource;
+use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Services\CartService;
@@ -46,8 +47,17 @@ class CartController extends Controller
     public function index(Request $request): JsonResource
     {
         $sessionId = $request->input('session_id');
-
-        return $this->cartService->getUserCartResource($sessionId);
+        $cart = $this->cartService->getUserCart($sessionId);
+        
+        // Return empty cart structure if no cart exists
+        if (!$cart) {
+            $cart = new Cart([
+                'items' => collect([]),
+                'total' => 0
+            ]);
+        }
+        
+        return new CartResource($cart);
     }
     
     /**
@@ -201,12 +211,26 @@ class CartController extends Controller
     public function destroy(Request $request): JsonResponse
     {
         $sessionId = $this->cartService->getSessionId($request);
-        $cart = $this->cartService->getUserCart($sessionId);
         
-        abort_if(!$cart, 404, 'Cart not found');
+        if (!auth()->id() && $sessionId) {
+            $cart = Cart::where('session_id', $sessionId)->first();
+            
+            if (!$cart) {
+                $anyCart = Cart::whereNull('user_id')->exists();
+                if ($anyCart) {
+                    abort(403, 'Unauthorized access to cart');
+                }
+                abort(404, 'Cart not found');
+            }
+        } else {
+            // Pour les utilisateurs authentifiés
+            $cart = $this->cartService->getUserCart($sessionId);
+            abort_if(!$cart, 404, 'Cart not found');
+        }
         
+        // Vérifier la propriété
         abort_unless(
-            $this->cartService->verifyCartOwnership($cart, $request),
+            $this->cartService->verifyCartOwnership($cart, $sessionId),
             403,
             'Unauthorized access to cart'
         );

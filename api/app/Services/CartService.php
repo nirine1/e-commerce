@@ -7,53 +7,76 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\CartResource;
 
 class CartService
 {
     /**
-     * Get session ID based on authentication status
+     * Get session ID from request or authenticated user
      */
     public function getSessionId(Request $request): ?string
     {
-        if (Auth::check()) {
-            return null;
-        }
-        
-        return $request->input('session_id') 
-            ?? abort(400, 'Session ID is required for guest users');
+        return $request->input('session_id');
     }
 
     /**
-     * Get or create cart for user/guest
+     * Get user's cart (authenticated or guest)
      */
-    public function getOrCreateCart(?string $sessionId): Cart
+    public function getUserCart(?string $sessionId): ?Cart
     {
-        return $this->getUserCart($sessionId) 
-            ?? Cart::create([
-                'session_id' => $sessionId,
-                'user_id' => Auth::id()
-            ]);
+        if (Auth::check()) {
+            return Cart::with('items.product')->where('user_id', Auth::id())->first();
+        }
+
+        if ($sessionId) {
+            return Cart::with('items.product')->where('session_id', $sessionId)->first();
+        }
+
+        return null;
     }
 
     /**
-     * Add or update item in cart
+     * Add item to cart or update quantity if exists
      */
     public function addItem(int $productId, int $quantity, ?string $sessionId): CartItem
     {
-        $cart = $this->getOrCreateCart($sessionId);
         $product = Product::findOrFail($productId);
         
-        return CartItem::updateOrCreate(
-            [
-                'cart_id' => $cart->id,
-                'product_id' => $productId
-            ],
-            [
-                'quantity' => $quantity,
-                'price' => $product->price
-            ]
-        );
+        if (!$product->is_active) {
+            throw new \Exception('Product is not available');
+        }
+        
+        $cart = $this->getOrCreateCart($sessionId);
+        
+        $existingItem = CartItem::where('cart_id', $cart->id)
+            ->where('product_id', $productId)
+            ->first();
+        
+        if ($existingItem) {
+            $newQuantity = $existingItem->quantity + $quantity;
+            
+            if ($newQuantity > $product->quantity) {
+                throw new \Exception('Insufficient stock');
+            }
+            
+            $existingItem->quantity = $newQuantity;
+            $existingItem->save();
+            $existingItem->load('product');
+            return $existingItem;
+        }
+        
+        if ($quantity > $product->quantity) {
+            throw new \Exception('Insufficient stock');
+        }
+        
+        $cartItem = CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $productId,
+            'quantity' => $quantity,
+            'price' => $product->price,
+        ]);
+        
+        $cartItem->load('product');
+        return $cartItem;
     }
 
     /**
@@ -61,11 +84,7 @@ class CartService
      */
     public function updateItem(CartItem $cartItem, int $quantity): CartItem
     {
-        $cartItem->update([
-            'quantity' => $quantity,
-            'price' => $cartItem->product->price
-        ]);
-
+        $cartItem->update(['quantity' => $quantity]);
         return $cartItem->fresh('product');
     }
 
@@ -82,55 +101,63 @@ class CartService
      */
     public function clearCart(Cart $cart): void
     {
+        $cart->items()->delete();
         $cart->delete();
     }
 
     /**
-     * Verify cart belongs to current user/session
-     */
-    public function verifyCartOwnership(Cart $cart, Request $request): bool
-    {
-        $isAuthenticated = Auth::check() && $cart->user_id === Auth::id();
-        $isGuest = !Auth::check() && $cart->session_id === $request->input('session_id');
-        
-        return $isAuthenticated || $isGuest;
-    }
-
-    /**
-     * Verify cart item belongs to current user/session
+     * Verify cart item ownership
      */
     public function verifyCartItemOwnership(CartItem $cartItem, ?string $sessionId): bool
     {
-        $cart = $this->getUserCart($sessionId);
+        $cart = $cartItem->cart;
         
-        return $cart && $cartItem->cart_id === $cart->id;
+        if (Auth::check()) {
+            return $cart->user_id === Auth::id();
+        }
+        
+        if ($sessionId) {
+            return $cart->session_id === $sessionId;
+        }
+        
+        return false;
     }
 
     /**
-     * Get user cart by session or user ID
+     * Verify cart ownership
      */
-    public function getUserCart(?string $sessionId): ?Cart
+    public function verifyCartOwnership(Cart $cart, ?string $sessionId): bool
     {
-        $userId = Auth::id();
-
-        return Cart::where(function($query) use ($userId, $sessionId) {
-            if ($userId) {
-                $query->where('user_id', $userId);
-            } else {
-                $query->where('session_id', $sessionId);
-            }
-        })->first();
-    }
-
-    public function getUserCartResource(?string $sessionId)
-    {
-        $cart = $this->getUserCart($sessionId);
-        if( !$cart ) {
-            return null;
-        } else {
-            $cart->load('items');
-            return new CartResource($cart);
+        if (Auth::check()) {
+            return $cart->user_id === Auth::id();
         }
+        
+        if ($sessionId) {
+            return $cart->session_id === $sessionId;
+        }
+        
+        return false;
     }
 
+    /**
+     * Get or create cart for user/session
+     */
+    private function getOrCreateCart(?string $sessionId): Cart
+    {
+        if (Auth::check()) {
+            return Cart::firstOrCreate(
+                ['user_id' => Auth::id()],
+                ['session_id' => null]
+            );
+        }
+
+        if ($sessionId) {
+            return Cart::firstOrCreate(
+                ['session_id' => $sessionId],
+                ['user_id' => null]
+            );
+        }
+
+        throw new \Exception('Either user must be authenticated or session_id must be provided');
+    }
 }
