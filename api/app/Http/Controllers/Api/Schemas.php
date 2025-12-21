@@ -48,6 +48,30 @@ namespace App\Http\Controllers\Api;
  *     )
  * )
  *
+ *
+ * @OA\Schema(
+ *     schema="CartItem",
+ *     title="Cart Item",
+ *     description="Cart item model",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *
+ *     @OA\Property(property="cart_id", type="integer", example=5),
+ *     @OA\Property(property="product_id", type="integer", example=12),
+ *
+ *     @OA\Property(property="quantity", type="integer", example=3),
+ *
+ *     @OA\Property(property="price", type="number", format="float", example=19.99),
+ *
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-11-21T10:30:00.000000Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-11-21T11:00:00.000000Z"),
+ *
+ *     @OA\Property(
+ *         property="product",
+ *         description="Associated product",
+ *         ref="#/components/schemas/Product"
+ *     )
+ * )
  * @OA\Schema(
  *     schema="Category",
  *     title="Category",

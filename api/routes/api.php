@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,22 @@ Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
+
+// Cart Items
+Route::middleware('optional.auth')->group(function () {
+    Route::prefix('/cart')->group(function () {
+        Route::prefix('/items')->group(function () {
+            Route::post('/', [CartController::class, 'store']);
+            Route::put('/{cartItem}', [CartController::class, 'updateItem']);
+            Route::patch('/{cartItem}', [CartController::class, 'updateItem']);
+            Route::delete('/{cartItem}', [CartController::class, 'destroyItem']);
+        });
+
+        Route::delete('/', [CartController::class, 'destroy']);
+        Route::get('/', [CartController::class, 'index']);
+    });
+});
+
 // ===================================
 // Protected Routes (Require Authentication)
 // ===================================
@@ -56,6 +73,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::patch('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+    
+    
 
     // TODO: Add routes for Cart, Orders, Addresses, etc.
 });
