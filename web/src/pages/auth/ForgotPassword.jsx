@@ -1,28 +1,30 @@
 import { useState } from "react";
-import { useFormik } from 'formik';
-import { validationSchema } from "../../validations/register";
+import { Link } from "react-router-dom";
+import { useFormik } from "formik";
+import { validationSchema } from "../../validations/forgot-password";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card"
-import { Button } from '@/components/ui/button'
-import { FormField } from "../../components/form-field";
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import {
+    Alert,
+    AlertDescription
+} from "@/components/ui/alert";
+import { FormField } from "../../components/FormField";
 import { authService } from "../../services/auth";
 import { tokenService } from "../../services/token";
-import { Link } from 'react-router-dom';
 
-export default function Register() {
+export default function ForgotPassword() {
     const [apiError, setApiError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
     const formik = useFormik({
         initialValues: {
-            name: '',
             email: '',
-            password: '',
-            passwordConfirmation: ''
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
@@ -30,21 +32,17 @@ export default function Register() {
             setSuccessMessage('');
 
             try {
-                const result = await authService.register({
-                    name: values.name,
+                const result = await authService.forgotPassword({
                     email: values.email,
-                    password: values.password,
-                    passwordConfirmation: values.passwordConfirmation
                 });
 
                 if (result.success) {
                     tokenService.setToken(result.data.token);
 
                     resetForm();
-                    
-                    alert('Inscription réussie ! Bienvenue ' + result.data.user.name);
 
-                    // Redirection ou autre action après inscription réussie
+                    setSuccessMessage('Un email a été envoyé à ' + values.email)
+                    // Redirection ou autre action après connexion réussie
                     // Par exemple: navigate('/dashboard') avec React Router
 
                 } else {
@@ -52,7 +50,7 @@ export default function Register() {
                 }
             } catch (err) {
                 alert('Une erreur inattendue s\'est produite');
-                console.error('Erreur inscription:', err);
+                console.error('Erreur connexion:', err);
             } finally {
                 setSubmitting(false);
             }
@@ -64,22 +62,27 @@ export default function Register() {
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center">
-                        Inscription
+                        Mot de passe oublié ?
                     </CardTitle>
                     <p className="text-sm text-muted-foreground text-center">
-                        Créez votre compte pour commencer
+                        Pas de soucis, nous vous enverrons un email
                     </p>
                 </CardHeader>
-                
-                <CardContent>
-                    <div className="space-y-4">
-                        <FormField
-                            name="name"
-                            label="Nom complet"
-                            placeholder="Entrez votre nom complet"
-                            formik={formik}
-                        />
 
+                <CardContent>
+                    {successMessage && (
+                        <Alert className="mb-4">
+                            <AlertDescription>{successMessage}</AlertDescription>
+                        </Alert>
+                    )}
+
+                    {apiError && (
+                        <Alert variant="destructive" className="mb-4">
+                            <AlertDescription>{apiError}</AlertDescription>
+                        </Alert>
+                    )}
+
+                    <form className="space-y-4" onSubmit={formik.handleSubmit}>
                         <FormField
                             name="email"
                             type="email"
@@ -88,38 +91,23 @@ export default function Register() {
                             formik={formik}
                         />
 
-                        <FormField
-                            name="password"
-                            type="password"
-                            label="Mot de passe"
-                            placeholder="Créez un mot de passe sécurisé"
-                            formik={formik}
-                        />
-
-                        <FormField
-                            name="passwordConfirmation"
-                            type="password"
-                            label="Confirmer le mot de passe"
-                            placeholder="Confirmez votre mot de passe"
-                            formik={formik}
-                        />
-
                         <Button
                             onClick={formik.handleSubmit}
                             type='submit'
                             disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
-                            className="w-full"
+                            className="w-full cursor-pointer"
                             size="lg"
                         >
-                            S'inscrire
+                            {formik.isSubmitting && <Spinner />}
+                            Réinitialiser le mot de passe
                         </Button>
-                    </div>
-                    
+                    </form>
+
                     <div className="mt-6 text-center">
                         <p className="text-sm text-muted-foreground">
-                            Déjà un compte ?{' '}
+                            Retour à la {' '}
                             <Link to="/login" className="font-medium text-primary hover:underline">
-                                Se connecter
+                                connexion
                             </Link>
                         </p>
                     </div>

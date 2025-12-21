@@ -103,4 +103,15 @@ class Product extends Model
             }
         });
     }
+
+    /**
+     * Retrieve the model for a bound value.
+     * Supports both ID and slug lookups.
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('id', $value)
+            ->orWhere('slug', $value)
+            ->firstOrFail();
+    }
 }

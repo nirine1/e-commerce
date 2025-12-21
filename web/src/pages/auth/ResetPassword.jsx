@@ -7,14 +7,14 @@ import {
     CardContent,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
+} from "../../components/ui/card";
 import {
     Alert,
     AlertDescription
-} from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
-import { FormField } from "../../components/form-field";
+} from "../../components/ui/alert";
+import { Button } from "../../components/ui/button";
+import { Spinner } from "../../components/ui/spinner";
+import { FormField } from "../../components/FormField";
 import { authService } from "../../services/auth";
 import { tokenService } from "../../services/token";
 
