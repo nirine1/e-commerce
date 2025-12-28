@@ -2,19 +2,19 @@
 
 namespace Database\Seeders;
 
+use App\Models\Address;
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Category;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Address;
 
 class ShowcaseDataSeeder extends Seeder
 {
@@ -84,7 +84,7 @@ class ShowcaseDataSeeder extends Seeder
             [
                 'name' => 'John Doe',
                 'email' => 'john.doe@showcase.test',
-                'password' => Hash::make('Password123!'),
+                'password' => Hash::make(value: 'Password123!'),
                 'email_verified_at' => now(),
                 'date_of_birth' => '1995-05-15',
             ],
@@ -223,7 +223,7 @@ class ShowcaseDataSeeder extends Seeder
         return [
             $electronics, $clothing, $books, $home,
             $laptops, $smartphones, $accessories,
-            $menClothing, $womenClothing, $inactive
+            $menClothing, $womenClothing, $inactive,
         ];
     }
 
@@ -237,7 +237,7 @@ class ShowcaseDataSeeder extends Seeder
         $products = [];
 
         // Laptops
-        $laptopCategory = collect($categories)->first(fn($c) => $c->slug === 'laptops');
+        $laptopCategory = collect($categories)->first(fn ($c) => $c->slug === 'laptops');
 
         $products[] = $this->createProduct([
             'name' => 'MacBook Pro 16"',
@@ -274,7 +274,7 @@ class ShowcaseDataSeeder extends Seeder
         ], [$laptopCategory]);
 
         // Smartphones
-        $smartphoneCategory = collect($categories)->first(fn($c) => $c->slug === 'smartphones');
+        $smartphoneCategory = collect($categories)->first(fn ($c) => $c->slug === 'smartphones');
 
         $products[] = $this->createProduct([
             'name' => 'iPhone 15 Pro',
@@ -309,7 +309,7 @@ class ShowcaseDataSeeder extends Seeder
         ], [$smartphoneCategory]);
 
         // Accessories
-        $accessoriesCategory = collect($categories)->first(fn($c) => $c->slug === 'accessories');
+        $accessoriesCategory = collect($categories)->first(fn ($c) => $c->slug === 'accessories');
 
         $products[] = $this->createProduct([
             'name' => 'Wireless Mouse',
@@ -346,7 +346,7 @@ class ShowcaseDataSeeder extends Seeder
         ], [$accessoriesCategory]);
 
         // Men's Clothing
-        $menClothingCategory = collect($categories)->first(fn($c) => $c->slug === 'mens-clothing');
+        $menClothingCategory = collect($categories)->first(fn ($c) => $c->slug === 'mens-clothing');
 
         $products[] = $this->createProduct([
             'name' => 'Men\'s Cotton T-Shirt',
@@ -372,7 +372,7 @@ class ShowcaseDataSeeder extends Seeder
         ], [$menClothingCategory]);
 
         // Women's Clothing
-        $womenClothingCategory = collect($categories)->first(fn($c) => $c->slug === 'womens-clothing');
+        $womenClothingCategory = collect($categories)->first(fn ($c) => $c->slug === 'womens-clothing');
 
         $products[] = $this->createProduct([
             'name' => 'Women\'s Summer Dress',
@@ -398,7 +398,7 @@ class ShowcaseDataSeeder extends Seeder
         ], [$womenClothingCategory]);
 
         // Books
-        $booksCategory = collect($categories)->first(fn($c) => $c->slug === 'books');
+        $booksCategory = collect($categories)->first(fn ($c) => $c->slug === 'books');
 
         $products[] = $this->createProduct([
             'name' => 'The Art of Programming',
@@ -423,7 +423,7 @@ class ShowcaseDataSeeder extends Seeder
         ], [$booksCategory]);
 
         // Home & Garden
-        $homeCategory = collect($categories)->first(fn($c) => $c->slug === 'home-garden');
+        $homeCategory = collect($categories)->first(fn ($c) => $c->slug === 'home-garden');
 
         $products[] = $this->createProduct([
             'name' => 'Coffee Maker',
@@ -480,7 +480,7 @@ class ShowcaseDataSeeder extends Seeder
                 'slug' => "sample-product-{$i}",
                 'description' => "This is a sample product for testing purposes. Product number {$i}.",
                 'short_description' => "Sample product {$i}",
-                'sku' => "SAMPLE-" . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'sku' => 'SAMPLE-'.str_pad($i, 3, '0', STR_PAD_LEFT),
                 'price' => rand(10, 500) + (rand(0, 99) / 100),
                 'quantity' => rand(0, 100),
                 'weight' => rand(1, 50) / 10,
@@ -499,6 +499,7 @@ class ShowcaseDataSeeder extends Seeder
     {
         $product = Product::create($data);
         $product->categories()->attach(collect($categories)->pluck('id'));
+
         return $product;
     }
 
@@ -517,8 +518,8 @@ class ShowcaseDataSeeder extends Seeder
                 ProductImage::create([
                     'product_id' => $product->id,
                     // 'image_path' => "products/{$product->slug}-" . ($i + 1) . ".jpg",
-                    'image_path' => "seeds/product-sample-" . ($i + 1) . ".png",
-                    'alt_text' => $product->name . " - Image " . ($i + 1),
+                    'image_path' => 'seeds/product-sample-'.($i + 1).'.png',
+                    'alt_text' => $product->name.' - Image '.($i + 1),
                     'sort_order' => $i, // Set sort order to avoid unique constraint violation
                     'is_primary' => $i === 0, // First image is primary
                 ]);
@@ -612,7 +613,7 @@ class ShowcaseDataSeeder extends Seeder
 
                 $order = Order::create([
                     'user_id' => $user->id,
-                    'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+                    'order_number' => 'ORD-'.strtoupper(Str::random(10)),
                     'status' => $status,
                     'currency' => 'USD',
                     'subtotal' => 0, // Will calculate

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -32,7 +32,7 @@ class Product extends Model
         'is_active',
         'is_featured',
         'meta_title',
-        'meta_description'
+        'meta_description',
     ];
 
     /**
@@ -92,14 +92,14 @@ class Product extends Model
     protected static function booted(): void
     {
         static::creating(function (Product $product) {
-            if(!filled($product->slug)) {
+            if (! filled($product->slug)) {
                 $index = 0;
                 do {
                     $slug = Str::slug($product->name);
-                    $slug = $index > 0 ? ($slug  . '-' . uniqid()) : $slug;
+                    $slug = $index > 0 ? ($slug.'-'.uniqid()) : $slug;
                     $product->slug = $slug;
                     $index++;
-                } while(Product::where('slug', $slug)->exists());
+                } while (Product::where('slug', $slug)->exists());
             }
         });
     }

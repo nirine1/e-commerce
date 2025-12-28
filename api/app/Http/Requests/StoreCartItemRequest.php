@@ -24,7 +24,7 @@ class StoreCartItemRequest extends FormRequest
         return [
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:999'],
-            'session_id' => ['nullable', 'string', 'max:255']
+            'session_id' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -34,7 +34,7 @@ class StoreCartItemRequest extends FormRequest
             'product_id.required' => 'Product ID is required',
             'product_id.exists' => 'Product does not exist',
             'quantity.min' => 'Quantity must be at least 1',
-            'quantity.max' => 'Quantity cannot exceed 999'
+            'quantity.max' => 'Quantity cannot exceed 999',
         ];
     }
 }

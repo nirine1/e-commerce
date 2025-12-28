@@ -8,12 +8,13 @@ use App\Models\User;
 trait HasCartSetup
 {
     protected User $user;
+
     protected Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create user and product for tests
         $this->user = User::factory()->create();
         $this->product = Product::factory()->create([
@@ -21,7 +22,7 @@ trait HasCartSetup
             'sku' => 'TEST-001',
             'price' => 99.99,
             'quantity' => 100,
-            'is_active' => true
+            'is_active' => true,
         ]);
     }
 }

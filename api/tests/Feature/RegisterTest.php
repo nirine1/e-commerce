@@ -17,25 +17,25 @@ class RegisterTest extends TestCase
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123', 
+            'password_confirmation' => 'password123',
         ];
 
         $response = $this->postJson('/api/register', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonStructure([
-                     'user' => [
-                         'id',
-                         'name',
-                         'email',
-                         'created_at',
-                         'updated_at'
-                     ],
-                     'token'
-                 ]);
+            ->assertJsonStructure([
+                'user' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at',
+                    'updated_at',
+                ],
+                'token',
+            ]);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'john@example.com'
+            'email' => 'john@example.com',
         ]);
 
         $user = User::where('email', 'john@example.com')->first();
@@ -47,12 +47,12 @@ class RegisterTest extends TestCase
         $data = [
             'name' => 'John Doe',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
+            'password_confirmation' => 'password123',
         ];
 
         $response = $this->postJson('/api/register', $data);
 
-        $response->assertStatus(422); 
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
     }
 

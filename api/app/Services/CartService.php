@@ -40,42 +40,44 @@ class CartService
     public function addItem(int $productId, int $quantity, ?string $sessionId): CartItem
     {
         $product = Product::findOrFail($productId);
-        
-        if (!$product->is_active) {
+
+        if (! $product->is_active) {
             throw new \Exception('Product is not available');
         }
-        
+
         $cart = $this->getOrCreateCart($sessionId);
-        
+
         $existingItem = CartItem::where('cart_id', $cart->id)
             ->where('product_id', $productId)
             ->first();
-        
+
         if ($existingItem) {
             $newQuantity = $existingItem->quantity + $quantity;
-            
+
             if ($newQuantity > $product->quantity) {
                 throw new \Exception('Insufficient stock');
             }
-            
+
             $existingItem->quantity = $newQuantity;
             $existingItem->save();
             $existingItem->load('product');
+
             return $existingItem;
         }
-        
+
         if ($quantity > $product->quantity) {
             throw new \Exception('Insufficient stock');
         }
-        
+
         $cartItem = CartItem::create([
             'cart_id' => $cart->id,
             'product_id' => $productId,
             'quantity' => $quantity,
             'price' => $product->price,
         ]);
-        
+
         $cartItem->load('product');
+
         return $cartItem;
     }
 
@@ -85,6 +87,7 @@ class CartService
     public function updateItem(CartItem $cartItem, int $quantity): CartItem
     {
         $cartItem->update(['quantity' => $quantity]);
+
         return $cartItem->fresh('product');
     }
 
@@ -111,15 +114,15 @@ class CartService
     public function verifyCartItemOwnership(CartItem $cartItem, ?string $sessionId): bool
     {
         $cart = $cartItem->cart;
-        
+
         if (Auth::check()) {
             return $cart->user_id === Auth::id();
         }
-        
+
         if ($sessionId) {
             return $cart->session_id === $sessionId;
         }
-        
+
         return false;
     }
 
@@ -131,11 +134,11 @@ class CartService
         if (Auth::check()) {
             return $cart->user_id === Auth::id();
         }
-        
+
         if ($sessionId) {
             return $cart->session_id === $sessionId;
         }
-        
+
         return false;
     }
 

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -22,7 +22,7 @@ class Category extends Model
         'parent_id',
         'is_active',
         'meta_title',
-        'meta_description'
+        'meta_description',
     ];
 
     /**
@@ -55,14 +55,14 @@ class Category extends Model
     protected static function booted(): void
     {
         static::creating(function (Category $category) {
-            if(!filled($category->slug)) {
+            if (! filled($category->slug)) {
                 $index = 0;
                 do {
                     $slug = Str::slug($category->name);
-                    $slug = $index > 0 ? ($slug  . '-' . uniqid()) : $slug;
+                    $slug = $index > 0 ? ($slug.'-'.uniqid()) : $slug;
                     $category->slug = $slug;
                     $index++;
-                } while(Category::where('slug', $slug)->exists());
+                } while (Category::where('slug', $slug)->exists());
             }
         });
     }

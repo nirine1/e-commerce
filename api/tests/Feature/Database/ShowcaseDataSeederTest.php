@@ -2,22 +2,21 @@
 
 namespace Tests\Feature\Database;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Database\Seeders\ShowcaseDataSeeder;
-use Database\Seeders\RevertDataSeeder;
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\ProductImage;
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Address;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\User;
+use Database\Seeders\RevertDataSeeder;
+use Database\Seeders\ShowcaseDataSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
 class ShowcaseDataSeederTest extends TestCase
 {
@@ -345,7 +344,7 @@ class ShowcaseDataSeederTest extends TestCase
         $categoryCount = Category::whereIn('slug', [
             'electronics', 'clothing', 'books', 'home-garden',
             'laptops', 'smartphones', 'accessories',
-            'mens-clothing', 'womens-clothing', 'inactive-category'
+            'mens-clothing', 'womens-clothing', 'inactive-category',
         ])->count();
         $this->assertEquals(0, $categoryCount);
     }
@@ -357,7 +356,7 @@ class ShowcaseDataSeederTest extends TestCase
     {
         $this->seed(ShowcaseDataSeeder::class);
 
-        $revertSeeder = new RevertDataSeeder();
+        $revertSeeder = new RevertDataSeeder;
         $stats = $revertSeeder->getStatistics();
 
         // Check statistics contain expected keys
@@ -386,7 +385,7 @@ class ShowcaseDataSeederTest extends TestCase
     {
         // Don't seed any data
 
-        $revertSeeder = new RevertDataSeeder();
+        $revertSeeder = new RevertDataSeeder;
         $stats = $revertSeeder->getStatistics();
 
         // All counts should be 0

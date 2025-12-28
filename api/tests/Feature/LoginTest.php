@@ -32,9 +32,9 @@ class LoginTest extends TestCase
                     'name',
                     'email',
                     'created_at',
-                    'updated_at'
+                    'updated_at',
                 ],
-                'token'
+                'token',
             ]);
 
         $this->assertEquals($user->id, $response->json('user.id'));
@@ -112,12 +112,12 @@ class LoginTest extends TestCase
         $token = $user->createToken('api-token')->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson('/api/logout');
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Déconnecté avec succès'
+                'message' => 'Déconnecté avec succès',
             ]);
 
         // Verify token has been deleted
@@ -144,7 +144,7 @@ class LoginTest extends TestCase
         $token = $user->createToken('api-token')->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->getJson('/api/user');
 
         $response->assertStatus(200)
@@ -153,7 +153,7 @@ class LoginTest extends TestCase
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                ]
+                ],
             ]);
     }
 

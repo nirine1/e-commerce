@@ -6,6 +6,7 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -13,7 +14,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
-use Illuminate\Auth\Notifications\ResetPassword;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -49,8 +49,8 @@ class FortifyServiceProvider extends ServiceProvider
         // Customize the password reset link to point to the front-end
         ResetPassword::createUrlUsing(function ($user, string $token) {
             return env('VITE_APP_URL', 'http://localhost:3000')
-                . '/reset-password?token=' . $token 
-                . '&email=' . urlencode($user->email);
+                .'/reset-password?token='.$token
+                .'&email='.urlencode($user->email);
         });
     }
 }

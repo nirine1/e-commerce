@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
@@ -36,7 +36,7 @@ class CartFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'user_id' => null,
-            'session_id' => 'guest-' . Str::random(10),
+            'session_id' => 'guest-'.Str::random(10),
         ]);
     }
 }
