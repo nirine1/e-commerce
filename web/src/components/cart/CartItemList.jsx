@@ -2,12 +2,15 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 import { Label } from "@/components/ui/label";
 import { Trash2, Minus, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CartItemList = ({ items, updateCartItem, removeCartItem }) => {
     return (
         <div className="space-y-6">
             {items.length === 0 && (
-                <p>Votre panier est vide.</p>
+                <div>
+                    Vous n'avez rien dans votre panier, commencer par <Link to="/products" className="underline font-semibold">choisir des articles</Link>.
+                </div>
             )}
             {items.map((item) => (
                 <div className="flex flex-row w-full h-36 items-center gap-6 overflow-hidden" key={item.id}>
@@ -16,7 +19,7 @@ const CartItemList = ({ items, updateCartItem, removeCartItem }) => {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between w-full">
                                 <h2 className="scroll-m-20 text-xl font-semibold tracking-tight">{item.product.name}</h2>
-                                <Button 
+                                <Button
                                     variant="link"
                                     size="xs"
                                     className="hover:text-destructive"

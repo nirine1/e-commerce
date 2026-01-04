@@ -1,11 +1,9 @@
 import CartItemList from "../../components/cart/CartItemList";
-import ResourceList from "../../components/ResourceList";
 import { Button } from "@/components/ui/button";
-import { cartService } from "../../services/cart";
 import { useCart } from "../../contexts/cart";
 
 const ShoppingCart = () => {
-    const { count, total, updateCartItem, removeCartItem } = useCart();
+    const { items, count, total, updateCartItem, removeCartItem } = useCart();
 
     return (
         <>
@@ -13,15 +11,10 @@ const ShoppingCart = () => {
 
             <div className="grid grid-cols-3 mt-6 gap-6">
                 <div className="col-span-2 border-y-2 border-sidebar-accent py-6">
-                    <ResourceList
-                        service={cartService.fetchCart}
-                        renderItems={(items) => <CartItemList 
-                                items={items.data?.data?.items ?? []} 
-                                updateCartItem={updateCartItem}
-                                removeCartItem={removeCartItem}
-                            />}
-                        emptyMessage="Votre panier est vide."
-                        loadingMessage="Chargement des articles..."
+                    <CartItemList
+                        items={items}
+                        updateCartItem={updateCartItem}
+                        removeCartItem={removeCartItem}
                     />
                 </div>
                 <div className="col-span-1 px-4 py-6 bg-accent">
@@ -47,7 +40,7 @@ const ShoppingCart = () => {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
-export default ShoppingCart
+export default ShoppingCart;
