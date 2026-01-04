@@ -43,6 +43,10 @@ class Product extends Model
         'cost_price',
     ];
 
+    protected $with = [
+        'images'
+    ];
+
     /**
      * The attributes that should be cast.
      */

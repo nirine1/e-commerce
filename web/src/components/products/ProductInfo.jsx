@@ -1,7 +1,10 @@
 import { Button } from "../../components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "../../contexts/cart";
 
-const ProductInfo = ({ name, sku, categories, shortDescription, price, comparePrice, inStock, quantity }) => {
+const ProductInfo = ({ id, name, sku, categories, shortDescription, price, comparePrice, inStock, quantity }) => {
+    const { addToCart } = useCart();
+
     return (
         <>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -67,7 +70,7 @@ const ProductInfo = ({ name, sku, categories, shortDescription, price, comparePr
 
             {/* Add to Cart */}
             <div className="mt-6 flex items-center space-x-3">
-                <Button disabled={!inStock} >
+                <Button disabled={!inStock} onClick={() => addToCart(id, 1)} >
                     {inStock ? 'Ajouter au panier' : 'Indisponible'}
                 </Button>
             </div>

@@ -16,7 +16,7 @@ class CartResource extends JsonResource
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
             'items' => CartItemResource::collection($this->whenLoaded('items')),
-            'items_count' => $this->when(isset($this->items_count), $this->items_count),
+            'items_count' => $this->when(isset($this->items), count($this->items)),
         ];
     }
 }

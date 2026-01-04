@@ -1,6 +1,10 @@
 import { Tag, DollarSign, PackageCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCart } from "../../contexts/cart";
 
 const ProductCard = ({ product }) => {
+    const { addToCart } = useCart();
+
     return (
         <div className="max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer" onClick={() => window.location.href = `/products/${product.id}`}>
             <div className="relative">
@@ -31,10 +35,13 @@ const ProductCard = ({ product }) => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 mt-3">
-                    <button className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex justify-center items-center gap-2">
+                <div className="flex w-full items-center gap-2 mt-3">
+                    <Button size="lg" className="w-full" onClick={(e) => {
+                        e.stopPropagation()
+                        addToCart(product.id, 1)
+                    }}>
                         <Tag size={16} /> Ajouter dans le panier
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

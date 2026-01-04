@@ -48,6 +48,7 @@ const ProductShow = () => {
                     <div className="flex flex-col justify-between">
                         <div>
                             <ProductInfo 
+                                id={productData.id}
                                 name={productData.name}
                                 sku={productData.sku}
                                 categories={productData.categories}
