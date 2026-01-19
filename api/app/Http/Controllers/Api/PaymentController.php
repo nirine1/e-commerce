@@ -22,7 +22,7 @@ class PaymentController extends Controller
 
         $user = $request->user();
         $amount = $request->input('amount');
-        $currency = $request->input('currency', 'usd');
+        $currency = $request->input('currency', 'eur');
 
         try {
             $paymentIntentData = $this->stripeService->createPaymentIntent($user, $amount, $currency);

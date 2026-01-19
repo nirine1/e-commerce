@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\Webhooks\StripeWebhookController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -81,3 +83,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Stripe Payment Intent
     Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);    
 });
+
+Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleStripeWebhook']);
