@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
     
     
-
     // TODO: Add routes for Cart, Orders, Addresses, etc.
+
+    // Stripe Payment Intent
+    Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);    
 });
