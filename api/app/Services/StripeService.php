@@ -53,4 +53,22 @@ class StripeService {
             throw new Exception('Payment processing failed. Please try again later.');
         }
     }
+
+    public function confirmPaymentIntent(string $paymentIntentId): PaymentIntent {
+        try {
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+            $paymentIntent->confirm([
+                'return_url' => 'http://localhost:3000/payment-success',
+                'payment_method_options' => [
+                    'card' => [
+                        'request_three_d_secure' => 'any',
+                    ],
+                ],
+            ]);
+            return $paymentIntent;
+        } catch (ApiErrorException $th) {
+            Log::channel('stripe')->error('Error confirming payment intent: ' . $th->getMessage());
+            throw new Exception('Payment confirmation failed. Please try again later.');
+        }
+    }
 }

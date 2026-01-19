@@ -81,7 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // TODO: Add routes for Cart, Orders, Addresses, etc.
 
     // Stripe Payment Intent
-    Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);    
+    Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);  
+    Route::post('/payments/confirm-intent/{paymentIntentId}', [PaymentController::class, 'confirmPaymentIntent']);
 });
 
 Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleStripeWebhook']);

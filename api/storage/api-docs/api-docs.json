@@ -1026,6 +1026,119 @@
                 ]
             }
         },
+        "/payments/create-intent": {
+            "post": {
+                "tags": [
+                    "Stripe Payments"
+                ],
+                "summary": "Create a Stripe Payment Intent",
+                "description": "Creates a new Stripe Payment Intent for the authenticated user",
+                "operationId": "create-payment-intent",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "description": "Amount to be charged in the smallest currency unit (e.g., cents)",
+                                        "type": "integer",
+                                        "example": 5000
+                                    },
+                                    "currency": {
+                                        "description": "Currency code (default is 'eur')",
+                                        "type": "string",
+                                        "example": "eur"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment Intent created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "client_secret": {
+                                            "type": "string",
+                                            "example": "pi_1FHeJ2L3a2b3c4D5E6F7G8H9I_secret_1234567890abcdef"
+                                        },
+                                        "payment_intent_id": {
+                                            "type": "string",
+                                            "example": "pi_1FHeJ2L3a2b3c4D5E6F7G8H9I"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/payments/confirm-intent/{paymentIntentId}": {
+            "post": {
+                "tags": [
+                    "Stripe Payments"
+                ],
+                "summary": "Confirm a Stripe Payment Intent",
+                "description": "Confirms an existing Stripe Payment Intent",
+                "operationId": "confirm-payment-intent",
+                "parameters": [
+                    {
+                        "name": "paymentIntentId",
+                        "in": "path",
+                        "description": "The ID of the Payment Intent to confirm",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "pi_1FHeJ2L3a2b3c4D5E6F7G8H9I"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment Intent confirmed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "succeeded"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/products": {
             "get": {
                 "tags": [
@@ -2019,6 +2132,10 @@
         {
             "name": "Cart Item",
             "description": "Shopping cart endpoints - manage cart items (requires authentication or session ID for guests)"
+        },
+        {
+            "name": "Stripe Payments",
+            "description": "Stripe payment endpoints - manage payments"
         },
         {
             "name": "Products",
