@@ -21,11 +21,11 @@ class PaymentController extends Controller
 
     /**
      * @OA\Post(
-     *    path="/payments/create-intent",
-     *    operationId="create-payment-intent",
+     *    path="/payments/create-checkout-session",
+     *    operationId="create-checkout-session",
      *    tags={"Stripe Payments"},
-     *    summary="Create a Stripe Payment Intent",
-     *    description="Creates a new Stripe Payment Intent for the authenticated user",
+     *    summary="Create a Stripe Checkout Session",
+     *    description="Creates a Stripe Checkout Session and returns the URL to redirect the user",
      *    security={{"sanctum": {}}},
      *    @OA\RequestBody(
      *       required=true,
@@ -42,22 +42,28 @@ class PaymentController extends Controller
      *           type="string",
      *           example="eur",
      *           description="Currency code (default is 'eur')"
+     *         ),
+     *         @OA\Property(
+     *           property="description",
+     *           type="string",
+     *           example="Purchase description",
+     *           description="Description of the purchase"
      *         )
      *       )
      *    ),
      *    @OA\Response(
      *       response=200,
-     *       description="Payment Intent created successfully",
+     *       description="Checkout Session created successfully",
      *       @OA\JsonContent(
      *         @OA\Property(
-     *           property="client_secret",
+     *           property="checkout_url",
      *           type="string",
-     *           example="pi_1FHeJ2L3a2b3c4D5E6F7G8H9I_secret_1234567890abcdef"
+     *           example="https://checkout.stripe.com/c/pay/cs_test_..."
      *         ),
      *         @OA\Property(
-     *           property="payment_intent_id",
+     *           property="session_id",
      *           type="string",
-     *           example="pi_1FHeJ2L3a2b3c4D5E6F7G8H9I"
+     *           example="cs_test_1234567890"
      *         )
      *       )
      *    ),
@@ -67,71 +73,84 @@ class PaymentController extends Controller
      *    )
      * )
      */
-    public function createPaymentIntent(Request $request)
+    public function createCheckoutSession(Request $request)
     {
         $request->validate([
             'amount' => 'required|integer|min:1',
             'currency' => 'sometimes|string|size:3',
+            'description' => 'sometimes|string|max:255',
         ]);
 
         $user = $request->user();
         $amount = $request->input('amount');
         $currency = $request->input('currency', 'eur');
+        $description = $request->input('description', 'Payment');
 
         try {
-            $paymentIntentData = $this->stripeService->createPaymentIntent($user, $amount, $currency);
+            $sessionData = $this->stripeService->createCheckoutSession(
+                $user,
+                $amount,
+                $currency,
+                $description
+            );
 
             return response()->json([
-                'client_secret' => $paymentIntentData['client_secret'],
-                'payment_intent_id' => $paymentIntentData['payment_intent_id'],
-            ]);
+                'checkout_url' => $sessionData['url'], // lien pour rediriger l'utilisateur
+                'session_id' => $sessionData['id'],
+            ]);            
         } catch (\Exception $e) {
+            Log::error('Stripe checkout session error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
     /**
-     * @OA\Post(
-     *    path="/payments/confirm-intent/{paymentIntentId}",
-     *    operationId="confirm-payment-intent",
+     * @OA\Get(
+     *    path="/payment/success",
+     *    operationId="payment-success",
      *    tags={"Stripe Payments"},
-     *    summary="Confirm a Stripe Payment Intent",
-     *    description="Confirms an existing Stripe Payment Intent",
-     *    security={{"sanctum": {}}},
-     *    @OA\Parameter(
-     *       name="paymentIntentId",
-     *       in="path",
-     *       required=true,
-     *       description="The ID of the Payment Intent to confirm",
-     *       @OA\Schema(type="string", example="pi_1FHeJ2L3a2b3c4D5E6F7G8H9I")
-     *    ),
+     *    summary="Payment Success",
+     *    description="Endpoint called when the payment is successful",
      *    @OA\Response(
      *       response=200,
-     *       description="Payment Intent confirmed successfully",
+     *       description="Payment successful",
      *       @OA\JsonContent(
      *         @OA\Property(
-     *           property="status",
+     *           property="message",
      *           type="string",
-     *           example="succeeded"
+     *           example="Payment successful!"
      *         )
      *       )
-     *    ),
-     *    @OA\Response(
-     *       response=500,
-     *       description="Server error"
      *    )
      * )
      */
-    public function confirmPaymentIntent(Request $request, $paymentIntentId)
+    public function paymentSuccess(Request $request)
     {
-        try {
-            $paymentIntent = $this->stripeService->confirmPaymentIntent($paymentIntentId);
+        return response()->json(['message' => 'Payment successful!']);
+    }
 
-            return response()->json([
-                'status' => $paymentIntent->status,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+    /**
+     * @OA\Get(
+     *    path="/payment/cancel",
+     *    operationId="payment-cancel",
+     *    tags={"Stripe Payments"},
+     *    summary="Payment Cancel",
+     *    description="Endpoint called when the payment is canceled",
+     *    @OA\Response(
+     *       response=200,
+     *       description="Payment canceled",
+     *       @OA\JsonContent(
+     *         @OA\Property(
+     *           property="message",
+     *           type="string",
+     *           example="Payment canceled!"
+     *         )
+     *       )
+     *    )
+     * )
+     */
+    public function paymentCancel(Request $request)
+    {
+        return response()->json(['message' => 'Payment canceled!']);
     }
 }

@@ -1,74 +1,57 @@
-<?php 
+<?php
 
 namespace App\Services;
 
-use Stripe\Stripe;
-use Stripe\Customer;
-use Stripe\PaymentIntent;
-use Illuminate\Support\Facades\Config;
-use App\Models\User;
-use Exception;
-use Illuminate\Support\Facades\Log;
-use Stripe\Exception\ApiErrorException;
-use Stripe\Checkout\Session as StripeSession;
+use Stripe\StripeClient;
 use Stripe\Webhook;
-use Illuminate\Support\Str;
+use App\Models\User;
 
-class StripeService {
-    public function __construct() {
-        Stripe::setApiKey(config('services.stripe.secret'));
+class StripeService
+{
+    private StripeClient $stripe;
+
+    public function __construct()
+    {
+        $this->stripe = new StripeClient(config('services.stripe.secret'));
     }
 
-    public function getOrCreateCustomer(User $user): Customer {
-        if ($user->stripe_customer_id) {
-            return Customer::retrieve($user->stripe_customer_id);
-        }
-
-        $customer = Customer::create([
-            'email' => $user->email,
-            'name' => $user->name,
-        ]);
-        
-        $user->stripe_customer_id = $customer->id;
-        $user->save();
-
-        return $customer;
-    }
-
-    public function createPaymentIntent(User $user, int $amount, string $currency = 'eur'): PaymentIntent {
-        $customer = $this->getOrCreateCustomer($user);
-
-        try {
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $amount,
-                'currency' => $currency,
-                'customer' => $customer->id,
-                'metadata' => [
-                    'user_id' => $user->id,
-                ],
-            ]);
-
-            return $paymentIntent;
-        } catch (ApiErrorException $th) {
-            throw new Exception('Payment processing failed. Please try again later.');
-        }
-    }
-
-    public function confirmPaymentIntent(string $paymentIntentId): PaymentIntent {
-        try {
-            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
-            $paymentIntent->confirm([
-                'return_url' => 'http://localhost:3000/payment-success',
-                'payment_method_options' => [
-                    'card' => [
-                        'request_three_d_secure' => 'any',
+    public function createCheckoutSession(User $user, int $amount, string $currency, string $description)
+    {
+        $session = $this->stripe->checkout->sessions->create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => $currency,
+                    'product_data' => [
+                        'name' => $description,
                     ],
+                    'unit_amount' => $amount,
                 ],
-            ]);
-            return $paymentIntent;
-        } catch (ApiErrorException $th) {
-            Log::channel('stripe')->error('Error confirming payment intent: ' . $th->getMessage());
-            throw new Exception('Payment confirmation failed. Please try again later.');
-        }
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => config('app.frontend_url') . '/payment/success?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => config('app.frontend_url') . '/payment/cancel',
+            'customer_email' => $user->email,
+            'metadata' => [
+                'user_id' => $user->id,
+            ],
+        ]);
+
+        return [
+            'id' => $session->id,
+            'url' => $session->url,
+        ];
+    }
+
+    public function constructWebhookEvent(string $payload, string $sigHeader)
+    {
+        $webhookSecret = config('services.stripe.webhook_secret');
+
+        return Webhook::constructEvent(
+            $payload,
+            $sigHeader,
+            $webhookSecret
+        );
     }
 }

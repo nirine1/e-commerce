@@ -11,60 +11,64 @@ use Stripe\Exception\SignatureVerificationException;
 
 class StripeWebhookController extends Controller
 {
-    public function handleStripeWebhook(Request $request)
+    /**
+     * @OA\Post(
+     *    path="/webhooks/stripe",
+     *    operationId="stripe-webhook",
+     *    tags={"Stripe Payments"},
+     *    summary="Handle Stripe webhooks",
+     *    description="Endpoint to receive Stripe webhook events",
+     *    @OA\Response(
+     *       response=200,
+     *       description="Webhook processed successfully"
+     *    )
+     * )
+     */
+    public function handleWebhook(Request $request)
     {
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = config('services.stripe.webhook_secret');
 
         try {
-            $event = Webhook::constructEvent(
-                $payload,
-                $sigHeader,
-                $endpointSecret
-            );
-        } catch (\UnexpectedValueException $e) {
-            Log::channel('stripe')->error('Webhook payload error: ' . $e->getMessage());
-            return response()->json(['error' => 'Invalid payload'], 400);
-        } catch (SignatureVerificationException $e) {
-            Log::channel('stripe')->error('Webhook signature error: ' . $e->getMessage());
-            return response()->json(['error' => 'Invalid signature'], 400);
+            $event = $this->stripeService->constructWebhookEvent($payload, $sigHeader);
+
+            // Traiter l'événement selon son type
+            switch ($event->type) {
+                case 'checkout.session.completed':
+                    $this->handleCheckoutSessionCompleted($event->data->object);
+                    break;
+
+                case 'payment_intent.succeeded':
+                    $this->handlePaymentSucceeded($event->data->object);
+                    break;
+
+                case 'payment_intent.payment_failed':
+                    $this->handlePaymentFailed($event->data->object);
+                    break;
+
+                default:
+                    Log::info('Unhandled webhook event type: ' . $event->type);
+            }
+
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            Log::channel('stripe')->error('Webhook error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        Log::channel('stripe')->info('Webhook received: ' . $event->type);
-
-        switch ($event->type) {
-            case 'payment_intent.created':
-                $this->handlePaymentIntentCreated($event->data->object);
-                break;
-            
-            default:
-                Log::channel('stripe')->info('Unhandled event type: ' . $event->type);
-                break;
-        }
-
-        return response()->json(['status' => 'success'], 200);
     }
 
-    public function handlePaymentIntentCreated($paymentIntent)
+    private function handleCheckoutSessionCompleted($session)
     {
-        Log::channel('stripe')->info('Payment Intent Created: ' . $paymentIntent->id);
+        Log::channel('stripe')->info('Checkout session completed', [
+            'session_id' => $session->id,
+            'customer_email' => $session->customer_email,
+            'amount_total' => $session->amount_total,
+        ]);
 
-        try {
-            $payment = Payment::create([
-                'stripe_payment_intent_id' => $paymentIntent->id,
-                'amount' => $paymentIntent->amount,
-                'currency' => $paymentIntent->currency,
-                'status' => $paymentIntent->status,
-                'user_id' => $paymentIntent->metadata->user_id ?? null,
-            ]);
-
-            Log::channel('stripe')->info('Payment record created successfully: ' . $payment->id);
-            
-            return $payment;
-        } catch (\Throwable $th) {
-            Log::channel('stripe')->error('Failed to create payment record: ' . $th->getMessage());
-            throw $th; // Re-throw pour que Stripe réessaye
-        }
+        // Ici, tu peux :
+        // - Enregistrer la transaction dans ta DB
+        // - Mettre à jour le statut de la commande
+        // - Envoyer un email de confirmation
+        // - etc.
     }
 }

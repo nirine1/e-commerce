@@ -1026,14 +1026,14 @@
                 ]
             }
         },
-        "/payments/create-intent": {
+        "/payments/create-checkout-session": {
             "post": {
                 "tags": [
                     "Stripe Payments"
                 ],
-                "summary": "Create a Stripe Payment Intent",
-                "description": "Creates a new Stripe Payment Intent for the authenticated user",
-                "operationId": "create-payment-intent",
+                "summary": "Create a Stripe Checkout Session",
+                "description": "Creates a Stripe Checkout Session and returns the URL to redirect the user",
+                "operationId": "create-checkout-session",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1052,6 +1052,11 @@
                                         "description": "Currency code (default is 'eur')",
                                         "type": "string",
                                         "example": "eur"
+                                    },
+                                    "description": {
+                                        "description": "Description of the purchase",
+                                        "type": "string",
+                                        "example": "Purchase description"
                                     }
                                 },
                                 "type": "object"
@@ -1061,18 +1066,18 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Payment Intent created successfully",
+                        "description": "Checkout Session created successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "client_secret": {
+                                        "checkout_url": {
                                             "type": "string",
-                                            "example": "pi_1FHeJ2L3a2b3c4D5E6F7G8H9I_secret_1234567890abcdef"
+                                            "example": "https://checkout.stripe.com/c/pay/cs_test_..."
                                         },
-                                        "payment_intent_id": {
+                                        "session_id": {
                                             "type": "string",
-                                            "example": "pi_1FHeJ2L3a2b3c4D5E6F7G8H9I"
+                                            "example": "cs_test_1234567890"
                                         }
                                     },
                                     "type": "object"
@@ -1091,52 +1096,60 @@
                 ]
             }
         },
-        "/payments/confirm-intent/{paymentIntentId}": {
-            "post": {
+        "/payment/success": {
+            "get": {
                 "tags": [
                     "Stripe Payments"
                 ],
-                "summary": "Confirm a Stripe Payment Intent",
-                "description": "Confirms an existing Stripe Payment Intent",
-                "operationId": "confirm-payment-intent",
-                "parameters": [
-                    {
-                        "name": "paymentIntentId",
-                        "in": "path",
-                        "description": "The ID of the Payment Intent to confirm",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "pi_1FHeJ2L3a2b3c4D5E6F7G8H9I"
-                        }
-                    }
-                ],
+                "summary": "Payment Success",
+                "description": "Endpoint called when the payment is successful",
+                "operationId": "payment-success",
                 "responses": {
                     "200": {
-                        "description": "Payment Intent confirmed successfully",
+                        "description": "Payment successful",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "status": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "succeeded"
+                                            "example": "Payment successful!"
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Server error"
                     }
-                },
-                "security": [
-                    {
-                        "sanctum": []
+                }
+            }
+        },
+        "/payment/cancel": {
+            "get": {
+                "tags": [
+                    "Stripe Payments"
+                ],
+                "summary": "Payment Cancel",
+                "description": "Endpoint called when the payment is canceled",
+                "operationId": "payment-cancel",
+                "responses": {
+                    "200": {
+                        "description": "Payment canceled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment canceled!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                ]
+                }
             }
         },
         "/products": {
@@ -1768,6 +1781,21 @@
                         "sanctum": []
                     }
                 ]
+            }
+        },
+        "/webhooks/stripe": {
+            "post": {
+                "tags": [
+                    "Stripe Payments"
+                ],
+                "summary": "Handle Stripe webhooks",
+                "description": "Endpoint to receive Stripe webhook events",
+                "operationId": "stripe-webhook",
+                "responses": {
+                    "200": {
+                        "description": "Webhook processed successfully"
+                    }
+                }
             }
         }
     },
