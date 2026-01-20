@@ -3,49 +3,51 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
+        'stripe_session_id',
         'stripe_payment_intent_id',
         'stripe_customer_id',
+        'customer_email',
         'amount',
         'currency',
         'status',
         'payment_method',
         'description',
         'metadata',
+        'checkout_url',
+        'expires_at',
         'paid_at',
     ];
 
     protected $casts = [
+        'amount' => 'decimal:2',
         'metadata' => 'array',
         'paid_at' => 'datetime',
-        'amount' => 'decimal:2',
+        'expires_at' => 'datetime',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function isSuccessful(): bool
+    public function isPaid(): bool
     {
-        return $this->status === 'succeeded';
+        return $this->status === 'succeeded' && $this->paid_at !== null;
     }
 
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return in_array($this->status, ['pending', 'processing']);
     }
 
     public function isFailed(): bool
     {
-        return in_array($this->status, ['failed', 'canceled']);
+        return in_array($this->status, ['failed', 'canceled', 'expired']);
     }
 }

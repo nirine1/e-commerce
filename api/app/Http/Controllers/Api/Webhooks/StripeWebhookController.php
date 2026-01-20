@@ -8,22 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
+use App\Services\StripeService;
+use App\Models\User;
+
 
 class StripeWebhookController extends Controller
 {
-    /**
-     * @OA\Post(
-     *    path="/webhooks/stripe",
-     *    operationId="stripe-webhook",
-     *    tags={"Stripe Payments"},
-     *    summary="Handle Stripe webhooks",
-     *    description="Endpoint to receive Stripe webhook events",
-     *    @OA\Response(
-     *       response=200,
-     *       description="Webhook processed successfully"
-     *    )
-     * )
-     */
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
+    
     public function handleWebhook(Request $request)
     {
         $payload = $request->getContent();
@@ -47,7 +42,7 @@ class StripeWebhookController extends Controller
                     break;
 
                 default:
-                    Log::info('Unhandled webhook event type: ' . $event->type);
+                    Log::channel('stripe')->info('Unhandled webhook event type: ' . $event->type);
             }
 
             return response()->json(['status' => 'success']);
@@ -64,11 +59,33 @@ class StripeWebhookController extends Controller
             'customer_email' => $session->customer_email,
             'amount_total' => $session->amount_total,
         ]);
+    }
+    
+    private function handlePaymentSucceeded($session)
+    {
+        $user = User::where('email', $session->customer_email)->first();
+        Log::channel('stripe')->info('Checkout session completed', [
+            'session_id' => $session->id,
+            'customer_email' => $session->customer_email,
+            'amount_total' => $session->amount_total,
+        ]);
 
-        // Ici, tu peux :
-        // - Enregistrer la transaction dans ta DB
-        // - Mettre à jour le statut de la commande
-        // - Envoyer un email de confirmation
-        // - etc.
+        try {
+            $payment = Payment::create([
+                'user_id' => $user->id,
+                'stripe_session_id' => $session->id,
+                'customer_email' => $user->email,
+                'amount' => $session->amount_total / 100, // Convertir centimes en euros
+                'currency' => $session->currency,
+                'status' => 'success',
+                'description' => $session->description,
+                'checkout_url' => $session->url,
+                'expires_at' => now()->addMinutes(30),
+            ]);
+
+            Log::channel('stripe')->info('Payment record created', ['payment_id' => $payment->id]);
+        } catch (\Throwable $th) {
+            Log::channel('stripe')->error('Error creating payment record: ' . $th->getMessage());
+        }
     }
 }
