@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Stripe\StripeClient;
 use Stripe\Webhook;
-use App\Models\User;
+use Stripe\Checkout\Session;
 
 class StripeService
 {
@@ -15,35 +15,54 @@ class StripeService
         $this->stripe = new StripeClient(config('services.stripe.secret'));
     }
 
-    public function createCheckoutSession(User $user, int $amount, string $currency, string $description)
+    /**
+     * Créer une session Stripe Checkout
+     */
+    public function createCheckoutSession(
+        float $amount, 
+        $user, 
+        string $successUrl, 
+        string $cancelUrl, 
+        int $orderId
+    ): Session
     {
         $session = $this->stripe->checkout->sessions->create([
             'payment_method_types' => ['card'],
             'line_items' => [[
                 'price_data' => [
-                    'currency' => $currency,
+                    'currency' => 'eur',
                     'product_data' => [
-                        'name' => $description,
+                        'name' => 'Commande #' . $orderId,
+                        'description' => 'Paiement de la commande',
                     ],
-                    'unit_amount' => $amount,
+                    'unit_amount' => (int)($amount * 100),
                 ],
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
-            'success_url' => config('app.frontend_url') . '/payment/success?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => config('app.frontend_url') . '/payment/cancel',
             'customer_email' => $user->email,
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
             'metadata' => [
                 'user_id' => $user->id,
+                'order_id' => $orderId,
             ],
         ]);
 
-        return [
-            'id' => $session->id,
-            'url' => $session->url,
-        ];
+        return $session;
     }
 
+    /**
+     * Récupérer une session Stripe par son ID
+     */
+    public function retrieveSession(string $sessionId): Session
+    {
+        return Session::retrieve($sessionId);
+    }
+
+    /**
+     * Construire et valider un événement webhook Stripe
+     */
     public function constructWebhookEvent(string $payload, string $sigHeader)
     {
         $webhookSecret = config('services.stripe.webhook_secret');

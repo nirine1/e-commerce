@@ -1026,37 +1026,31 @@
                 ]
             }
         },
-        "/payments/create-checkout-session": {
+        "/payments/checkout": {
             "post": {
                 "tags": [
                     "Stripe Payments"
                 ],
-                "summary": "Create a Stripe Checkout Session",
-                "description": "Creates a Stripe Checkout Session and returns the URL to redirect the user",
-                "operationId": "create-checkout-session",
+                "summary": "Create Order and Stripe Checkout Session",
+                "description": "Create an order and initiate a Stripe Checkout session",
+                "operationId": "create-order-and-checkout",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "amount"
-                                ],
                                 "properties": {
-                                    "amount": {
-                                        "description": "Amount to be charged in the smallest currency unit (e.g., cents)",
+                                    "order_id": {
                                         "type": "integer",
-                                        "example": 5000
+                                        "example": 123
                                     },
-                                    "currency": {
-                                        "description": "Currency code (default is 'eur')",
+                                    "success_url": {
                                         "type": "string",
-                                        "example": "eur"
+                                        "example": "https://frontend.com/payment/success"
                                     },
-                                    "description": {
-                                        "description": "Description of the purchase",
+                                    "cancel_url": {
                                         "type": "string",
-                                        "example": "Purchase description"
+                                        "example": "https://frontend.com/payment/cancel"
                                     }
                                 },
                                 "type": "object"
@@ -1066,14 +1060,22 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Checkout Session created successfully",
+                        "description": "Checkout session created successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "order_id": {
+                                            "type": "integer",
+                                            "example": 123
+                                        },
                                         "checkout_url": {
                                             "type": "string",
-                                            "example": "https://checkout.stripe.com/c/pay/cs_test_..."
+                                            "example": "https://checkout.stripe.com/pay/cs_test_1234567890"
                                         },
                                         "session_id": {
                                             "type": "string",
@@ -1084,6 +1086,15 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     },
                     "500": {
                         "description": "Server error"
@@ -1096,60 +1107,89 @@
                 ]
             }
         },
-        "/payment/success": {
+        "/payments/verify/{sessionId}": {
             "get": {
                 "tags": [
                     "Stripe Payments"
                 ],
-                "summary": "Payment Success",
-                "description": "Endpoint called when the payment is successful",
-                "operationId": "payment-success",
+                "summary": "Verify Payment Status",
+                "description": "Verify the status of a payment using the Stripe session ID",
+                "operationId": "verify-payment",
+                "parameters": [
+                    {
+                        "name": "sessionId",
+                        "in": "path",
+                        "description": "Stripe Checkout Session ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "cs_test_1234567890"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Payment successful",
+                        "description": "Payment verified successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Payment successful!"
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payment": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "order_id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 49.99
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "eur"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "success"
+                                                },
+                                                "paid_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-01T12:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Payment not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
-                }
-            }
-        },
-        "/payment/cancel": {
-            "get": {
-                "tags": [
-                    "Stripe Payments"
-                ],
-                "summary": "Payment Cancel",
-                "description": "Endpoint called when the payment is canceled",
-                "operationId": "payment-cancel",
-                "responses": {
-                    "200": {
-                        "description": "Payment canceled",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Payment canceled!"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                },
+                "security": [
+                    {
+                        "sanctum": []
                     }
-                }
+                ]
             }
         },
         "/products": {
@@ -1781,21 +1821,6 @@
                         "sanctum": []
                     }
                 ]
-            }
-        },
-        "/webhooks/stripe": {
-            "post": {
-                "tags": [
-                    "Stripe Payments"
-                ],
-                "summary": "Handle Stripe webhooks",
-                "description": "Endpoint to receive Stripe webhook events",
-                "operationId": "stripe-webhook",
-                "responses": {
-                    "200": {
-                        "description": "Webhook processed successfully"
-                    }
-                }
             }
         }
     },

@@ -22,6 +22,7 @@ class Payment extends Model
         'checkout_url',
         'expires_at',
         'paid_at',
+        'order_id',
     ];
 
     protected $casts = [
@@ -34,6 +35,11 @@ class Payment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function isPaid(): bool

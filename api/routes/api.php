@@ -61,29 +61,11 @@ Route::middleware('optional.auth')->group(function () {
 // Protected Routes (Require Authentication)
 // ===================================
 Route::middleware('auth:sanctum')->group(function () {
-    // Auth
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [AuthController::class, 'user']);
 
-    // Products - Admin only (create, update, delete)
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{product}', [ProductController::class, 'update']);
-    Route::patch('/products/{product}', [ProductController::class, 'update']);
-    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+    // Checkout - Initier le paiement d'une commande
+    Route::post('/checkout', [PaymentController::class, 'createOrderAndCheckout']);
+    Route::get('/verify/{sessionId}', [PaymentController::class, 'verifyPayment']);
 
-    // Categories - Admin only (create, update, delete)
-    Route::post('/categories', [CategoryController::class, 'store']);
-    Route::put('/categories/{category}', [CategoryController::class, 'update']);
-    Route::patch('/categories/{category}', [CategoryController::class, 'update']);
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
-    
-    
-    // TODO: Add routes for Cart, Orders, Addresses, etc.
-
-    // Stripe Checkout session
-    Route::post('/payments/create-checkout-session', [PaymentController::class, 'createCheckoutSession']);
-    Route::get('/payment/success', [PaymentController::class, 'paymentSuccess']);
-    Route::get('/payment/cancel', [PaymentController::class, 'paymentCancel']);
 });
 
 Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleWebhook']);
