@@ -7,7 +7,6 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -18,73 +17,94 @@ class CategoryController extends Controller
      *     tags={"Categories"},
      *     summary="List all categories",
      *     description="Get list of categories with optional filtering and hierarchical loading",
+     *
      *     @OA\Parameter(
      *         name="parent_id",
      *         in="query",
      *         description="Filter by parent ID (use 'null' for root categories)",
      *         required=false,
+     *
      *         @OA\Schema(type="string", example="null")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="is_active",
      *         in="query",
      *         description="Filter by active status",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean", example=true)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="with_children",
      *         in="query",
      *         description="Include child categories",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean", example=true)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="with_parent",
      *         in="query",
      *         description="Include parent category",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean", example=true)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="with_counts",
      *         in="query",
      *         description="Include product counts",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean", example=true)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="all",
      *         in="query",
      *         description="Return all categories (no pagination)",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean", example=true)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sort_by",
      *         in="query",
      *         description="Sort field (name, created_at, updated_at)",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"name", "created_at", "updated_at"}, example="name")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sort_direction",
      *         in="query",
      *         description="Sort direction",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"asc", "desc"}, example="asc")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Items per page (default: 15)",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", example=15)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Category"))
      *         )
      *     )
@@ -135,6 +155,7 @@ class CategoryController extends Controller
         // Return all categories or paginate
         if ($request->boolean('all')) {
             $categories = $query->get();
+
             return CategoryResource::collection($categories);
         }
 
@@ -152,10 +173,13 @@ class CategoryController extends Controller
      *     summary="Create a new category",
      *     description="Create a new category (requires authentication)",
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name"},
+     *
      *             @OA\Property(property="name", type="string", maxLength=255, example="Electronics"),
      *             @OA\Property(property="description", type="string", nullable=true, example="Electronic devices and accessories"),
      *             @OA\Property(property="image", type="string", nullable=true, example="categories/electronics.jpg"),
@@ -165,13 +189,17 @@ class CategoryController extends Controller
      *             @OA\Property(property="meta_description", type="string", maxLength=500, nullable=true, example="Browse all electronics")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Category created successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", ref="#/components/schemas/Category")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="Unauthenticated"),
      *     @OA\Response(response=422, description="Validation error")
      * )
@@ -207,20 +235,26 @@ class CategoryController extends Controller
      *     tags={"Categories"},
      *     summary="Get a single category",
      *     description="Get detailed information about a specific category by ID or slug",
+     *
      *     @OA\Parameter(
      *         name="id_or_slug",
      *         in="path",
      *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
+     *
      *         @OA\Schema(type="string", example="electronics")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", ref="#/components/schemas/Category")
      *         )
      *     ),
+     *
      *     @OA\Response(response=404, description="Category not found")
      * )
      */
@@ -242,28 +276,37 @@ class CategoryController extends Controller
      *     summary="Update a category",
      *     description="Update an existing category by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="id_or_slug",
      *         in="path",
      *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
+     *
      *         @OA\Schema(type="string", example="electronics")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", maxLength=255, example="Updated Category Name"),
      *             @OA\Property(property="description", type="string", nullable=true, example="Updated description"),
      *             @OA\Property(property="is_active", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Category updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", ref="#/components/schemas/Category")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="Unauthenticated"),
      *     @OA\Response(response=404, description="Category not found"),
      *     @OA\Response(response=422, description="Validation error")
@@ -276,27 +319,36 @@ class CategoryController extends Controller
      *     summary="Partially update a category",
      *     description="Partially update an existing category by ID or slug (requires authentication)",
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="id_or_slug",
      *         in="path",
      *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
+     *
      *         @OA\Schema(type="string", example="electronics")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", maxLength=255, example="Updated Name"),
      *             @OA\Property(property="is_active", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Category updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", ref="#/components/schemas/Category")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="Unauthenticated"),
      *     @OA\Response(response=404, description="Category not found"),
      *     @OA\Response(response=422, description="Validation error")
@@ -345,27 +397,36 @@ class CategoryController extends Controller
      *     summary="Delete a category",
      *     description="Delete an existing category by ID or slug (requires authentication). Cannot delete if category has children or products.",
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="id_or_slug",
      *         in="path",
      *         description="Category ID or slug (e.g., '1' or 'electronics')",
      *         required=true,
+     *
      *         @OA\Schema(type="string", example="electronics")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Category deleted successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Category deleted successfully")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Cannot delete category with subcategories or products",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Cannot delete category with products. Reassign products first.")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="Unauthenticated"),
      *     @OA\Response(response=404, description="Category not found")
      * )
@@ -375,21 +436,21 @@ class CategoryController extends Controller
         // Check if category has children
         if ($category->children()->count() > 0) {
             return response()->json([
-                'message' => 'Cannot delete category with subcategories. Delete or reassign subcategories first.'
+                'message' => 'Cannot delete category with subcategories. Delete or reassign subcategories first.',
             ], 422);
         }
 
         // Check if category has products
         if ($category->products()->count() > 0) {
             return response()->json([
-                'message' => 'Cannot delete category with products. Reassign products first.'
+                'message' => 'Cannot delete category with products. Reassign products first.',
             ], 422);
         }
 
         $category->delete();
 
         return response()->json([
-            'message' => 'Category deleted successfully'
+            'message' => 'Category deleted successfully',
         ], 200);
     }
 }

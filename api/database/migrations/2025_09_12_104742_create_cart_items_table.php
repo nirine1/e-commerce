@@ -27,5 +27,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('cart_items');
     }
-
 };

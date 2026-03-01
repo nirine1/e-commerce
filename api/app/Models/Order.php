@@ -39,7 +39,7 @@ class Order extends Model
         'shipping_postal_code',
         'shipping_country',
         'shipped_at',
-        'delivered_at'
+        'delivered_at',
     ];
 
     /**

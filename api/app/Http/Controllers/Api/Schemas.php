@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
  *     schema="Product",
  *     title="Product",
  *     description="Product model",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="MacBook Pro 16 inch"),
  *     @OA\Property(property="slug", type="string", example="macbook-pro-16"),
@@ -39,15 +40,17 @@ namespace App\Http\Controllers\Api;
  *     @OA\Property(
  *         property="categories",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/CategorySimple")
  *     ),
+ *
  *     @OA\Property(
  *         property="images",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/ProductImage")
  *     )
  * )
- *
  *
  * @OA\Schema(
  *     schema="CartItem",
@@ -55,27 +58,24 @@ namespace App\Http\Controllers\Api;
  *     description="Cart item model",
  *
  *     @OA\Property(property="id", type="integer", example=1),
- *
  *     @OA\Property(property="cart_id", type="integer", example=5),
  *     @OA\Property(property="product_id", type="integer", example=12),
- *
  *     @OA\Property(property="quantity", type="integer", example=3),
- *
  *     @OA\Property(property="price", type="number", format="float", example=19.99),
- *
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-11-21T10:30:00.000000Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-11-21T11:00:00.000000Z"),
- *
  *     @OA\Property(
  *         property="product",
  *         description="Associated product",
  *         ref="#/components/schemas/Product"
  *     )
  * )
+ *
  * @OA\Schema(
  *     schema="Category",
  *     title="Category",
  *     description="Category model",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Electronics"),
  *     @OA\Property(property="slug", type="string", example="electronics"),
@@ -96,6 +96,7 @@ namespace App\Http\Controllers\Api;
  *     @OA\Property(
  *         property="children",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/CategorySimple")
  *     )
  * )
@@ -104,6 +105,7 @@ namespace App\Http\Controllers\Api;
  *     schema="CategorySimple",
  *     title="Category Simple",
  *     description="Simplified category model for relationships",
+ *
  *     @OA\Property(property="id", type="integer", example=2),
  *     @OA\Property(property="name", type="string", example="Laptops"),
  *     @OA\Property(property="slug", type="string", example="laptops"),
@@ -115,6 +117,7 @@ namespace App\Http\Controllers\Api;
  *     schema="ProductImage",
  *     title="Product Image",
  *     description="Product image model",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="image_path", type="string", example="products/laptop-001.jpg"),
  *     @OA\Property(property="image_url", type="string", example="http://localhost:8080/storage/products/laptop-001.jpg"),
@@ -126,6 +129,7 @@ namespace App\Http\Controllers\Api;
  *     schema="ValidationError",
  *     title="Validation Error",
  *     description="Validation error response",
+ *
  *     @OA\Property(property="message", type="string", example="The given data was invalid."),
  *     @OA\Property(
  *         property="errors",
@@ -133,11 +137,14 @@ namespace App\Http\Controllers\Api;
  *         @OA\Property(
  *             property="sku",
  *             type="array",
+ *
  *             @OA\Items(type="string", example="The sku has already been taken.")
  *         ),
+ *
  *         @OA\Property(
  *             property="price",
  *             type="array",
+ *
  *             @OA\Items(type="string", example="The price must be at least 0.")
  *         )
  *     )
@@ -147,6 +154,7 @@ namespace App\Http\Controllers\Api;
  *     schema="ErrorResponse",
  *     title="Error Response",
  *     description="Generic error response",
+ *
  *     @OA\Property(property="message", type="string", example="An error occurred")
  * )
  */

@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\ProductImage;
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Address;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RevertDataSeeder extends Seeder
 {
@@ -37,6 +37,7 @@ class RevertDataSeeder extends Seeder
 
             if ($showcaseUsers->isEmpty()) {
                 $this->command->info('ℹ️  No showcase data found to revert.');
+
                 return;
             }
 
@@ -97,6 +98,7 @@ class RevertDataSeeder extends Seeder
 
         if ($orderCount === 0) {
             $this->command->info('📋 No orders to delete');
+
             return;
         }
 
@@ -121,6 +123,7 @@ class RevertDataSeeder extends Seeder
 
         if ($cartCount === 0) {
             $this->command->info('🛒 No carts to delete');
+
             return;
         }
 
@@ -174,6 +177,7 @@ class RevertDataSeeder extends Seeder
 
         if ($productCount === 0) {
             $this->command->info('📦 No products to delete');
+
             return;
         }
 

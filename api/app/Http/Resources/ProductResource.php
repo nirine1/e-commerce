@@ -44,8 +44,8 @@ class ProductResource extends JsonResource
             // Relationships (loaded conditionally)
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'images' => ProductImageResource::collection($this->whenLoaded('images')),
-            'primary_image' => new ProductImageResource($this->whenLoaded('images', function() {
-                return $this->images->where('is_primary', true)->first();
+            'primary_image' => new ProductImageResource($this->whenLoaded('images', function () {
+                return $this->images->where('is_primary', true)->first() ?? $this->images->first();
             })),
         ];
     }

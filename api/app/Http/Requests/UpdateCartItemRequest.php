@@ -23,7 +23,7 @@ class UpdateCartItemRequest extends FormRequest
     {
         return [
             'quantity' => ['required', 'integer', 'min:1', 'max:999'],
-            'session_id' => ['nullable', 'string', 'max:255']
+            'session_id' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -32,7 +32,7 @@ class UpdateCartItemRequest extends FormRequest
         return [
             'quantity.required' => 'Quantity is required',
             'quantity.min' => 'Quantity must be at least 1',
-            'quantity.max' => 'Quantity cannot exceed 999'
+            'quantity.max' => 'Quantity cannot exceed 999',
         ];
     }
 }

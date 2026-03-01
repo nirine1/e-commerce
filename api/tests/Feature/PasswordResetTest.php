@@ -3,11 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -38,7 +38,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_password_reset_request_fails_with_missing_email(): void
@@ -46,7 +46,7 @@ class PasswordResetTest extends TestCase
         $response = $this->postJson('/api/forgot-password', []);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_password_reset_request_fails_with_invalid_email_format(): void
@@ -56,7 +56,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_user_can_reset_password_with_valid_token(): void
@@ -103,7 +103,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
 
         // Verify password was NOT changed
         $user->refresh();
@@ -126,7 +126,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['password']);
+            ->assertJsonValidationErrors(['password']);
     }
 
     public function test_password_reset_fails_with_short_password(): void
@@ -145,7 +145,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['password']);
+            ->assertJsonValidationErrors(['password']);
     }
 
     public function test_password_reset_fails_with_missing_token(): void
@@ -157,7 +157,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['token']);
+            ->assertJsonValidationErrors(['token']);
     }
 
     public function test_password_reset_fails_with_missing_email(): void
@@ -169,7 +169,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_password_reset_fails_with_wrong_email(): void
@@ -188,7 +188,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_password_reset_token_can_be_used_only_once(): void
@@ -219,7 +219,7 @@ class PasswordResetTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
 
         // Verify password is still the first new password
         $user->refresh();

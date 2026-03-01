@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class CartIndexTest extends TestCase
 {
-    use RefreshDatabase, HasCartSetup;
+    use HasCartSetup, RefreshDatabase;
 
     public function test_authenticated_user_can_get_their_cart(): void
     {
@@ -18,31 +18,31 @@ class CartIndexTest extends TestCase
         CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $response = $this->actingAs($this->user)
-                         ->getJson('/api/cart');
+            ->getJson('/api/cart');
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         'id',
-                         'user_id',
-                         'session_id',
-                         'items' => [
-                             '*' => [
-                                 'id',
-                                 'product_id',
-                                 'quantity',
-                                 'price',
-                                 'product'
-                             ]
-                         ],
-                         'created_at',
-                         'updated_at'
-                     ]
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'user_id',
+                    'session_id',
+                    'items' => [
+                        '*' => [
+                            'id',
+                            'product_id',
+                            'quantity',
+                            'price',
+                            'product',
+                        ],
+                    ],
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
     }
 
     public function test_guest_can_get_cart_with_session_id(): void
@@ -52,19 +52,19 @@ class CartIndexTest extends TestCase
         CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 1
+            'quantity' => 1,
         ]);
 
-        $response = $this->getJson('/api/cart?session_id=' . $sessionId);
+        $response = $this->getJson('/api/cart?session_id='.$sessionId);
 
         $response->assertStatus(200)
-                 ->assertJsonPath('data.session_id', $sessionId);
+            ->assertJsonPath('data.session_id', $sessionId);
     }
 
     public function test_get_cart_returns_empty_cart_when_no_cart_exists(): void
     {
         $response = $this->actingAs($this->user)
-                         ->getJson('/api/cart');
+            ->getJson('/api/cart');
 
         $response->assertStatus(200);
     }

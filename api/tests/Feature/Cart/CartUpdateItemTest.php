@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class CartUpdateItemTest extends TestCase
 {
-    use RefreshDatabase, HasCartSetup;
+    use HasCartSetup, RefreshDatabase;
 
     public function test_authenticated_user_can_update_cart_item_quantity(): void
     {
@@ -19,21 +19,21 @@ class CartUpdateItemTest extends TestCase
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $data = ['quantity' => 5];
 
         $response = $this->actingAs($this->user)
-                         ->putJson('/api/cart/items/' . $cartItem->id, $data);
+            ->putJson('/api/cart/items/'.$cartItem->id, $data);
 
         $response->assertStatus(200)
-                 ->assertJsonPath('data.id', $cartItem->id)
-                 ->assertJsonPath('data.quantity', 5);
+            ->assertJsonPath('data.id', $cartItem->id)
+            ->assertJsonPath('data.quantity', 5);
 
         $this->assertDatabaseHas('cart_items', [
             'id' => $cartItem->id,
-            'quantity' => 5
+            'quantity' => 5,
         ]);
     }
 
@@ -44,22 +44,22 @@ class CartUpdateItemTest extends TestCase
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 1
+            'quantity' => 1,
         ]);
 
         $data = [
             'quantity' => 4,
-            'session_id' => $sessionId
+            'session_id' => $sessionId,
         ];
 
-        $response = $this->putJson('/api/cart/items/' . $cartItem->id, $data);
+        $response = $this->putJson('/api/cart/items/'.$cartItem->id, $data);
 
         $response->assertStatus(200)
-                 ->assertJsonPath('data.quantity', 4);
+            ->assertJsonPath('data.quantity', 4);
 
         $this->assertDatabaseHas('cart_items', [
             'id' => $cartItem->id,
-            'quantity' => 4
+            'quantity' => 4,
         ]);
     }
 
@@ -70,20 +70,20 @@ class CartUpdateItemTest extends TestCase
         $cartItem = CartItem::factory()->create([
             'cart_id' => $otherCart->id,
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $data = ['quantity' => 10];
 
         $response = $this->actingAs($this->user)
-                         ->putJson('/api/cart/items/' . $cartItem->id, $data);
+            ->putJson('/api/cart/items/'.$cartItem->id, $data);
 
         $response->assertStatus(403);
 
         // Verify quantity was not changed
         $this->assertDatabaseHas('cart_items', [
             'id' => $cartItem->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
     }
 
@@ -91,20 +91,20 @@ class CartUpdateItemTest extends TestCase
     {
         $sessionId = 'session-correct';
         $wrongSessionId = 'session-wrong';
-        
+
         $cart = Cart::factory()->create(['session_id' => $sessionId]);
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $data = [
             'quantity' => 10,
-            'session_id' => $wrongSessionId
+            'session_id' => $wrongSessionId,
         ];
 
-        $response = $this->putJson('/api/cart/items/' . $cartItem->id, $data);
+        $response = $this->putJson('/api/cart/items/'.$cartItem->id, $data);
 
         $response->assertStatus(403);
     }
@@ -115,16 +115,16 @@ class CartUpdateItemTest extends TestCase
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $data = ['quantity' => 0];
 
         $response = $this->actingAs($this->user)
-                         ->putJson('/api/cart/items/' . $cartItem->id, $data);
+            ->putJson('/api/cart/items/'.$cartItem->id, $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['quantity']);
+            ->assertJsonValidationErrors(['quantity']);
     }
 
     public function test_patch_method_also_updates_cart_item(): void
@@ -133,15 +133,15 @@ class CartUpdateItemTest extends TestCase
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 3
+            'quantity' => 3,
         ]);
 
         $data = ['quantity' => 7];
 
         $response = $this->actingAs($this->user)
-                         ->patchJson('/api/cart/items/' . $cartItem->id, $data);
+            ->patchJson('/api/cart/items/'.$cartItem->id, $data);
 
         $response->assertStatus(200)
-                 ->assertJsonPath('data.quantity', 7);
+            ->assertJsonPath('data.quantity', 7);
     }
 }

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -26,10 +26,13 @@ class AuthController extends Controller
      *    tags={"Auth"},
      *    summary="Register a new user",
      *    description="Creates a new user account and returns an authentication token",
+     *
      *    @OA\RequestBody(
      *       required=true,
+     *
      *       @OA\JsonContent(
      *         required={"name","email","password"},
+     *
      *         @OA\Property(
      *           property="name",
      *           type="string",
@@ -52,10 +55,13 @@ class AuthController extends Controller
      *         )
      *       )
      *    ),
+     *
      *    @OA\Response(
      *       response=201,
      *       description="User registered successfully",
+     *
      *       @OA\JsonContent(
+     *
      *         @OA\Property(
      *           property="user",
      *           type="object",
@@ -72,12 +78,13 @@ class AuthController extends Controller
      *         )
      *       )
      *    ),
+     *
      *    @OA\Response(response=422, description="Validation error")
      * )
      */
     public function register(RegisterRequest $request)
     {
-        $user = new User();
+        $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password; // Auto Hashed
@@ -87,7 +94,7 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'token' => $token
+            'token' => $token,
         ], Response::HTTP_CREATED);
     }
 
@@ -98,10 +105,13 @@ class AuthController extends Controller
      *    tags={"Auth"},
      *    summary="Authenticate user",
      *    description="Logs in an existing user and returns an authentication token",
+     *
      *    @OA\RequestBody(
      *       required=true,
+     *
      *       @OA\JsonContent(
      *         required={"email","password"},
+     *
      *         @OA\Property(
      *           property="email",
      *           type="string",
@@ -118,10 +128,13 @@ class AuthController extends Controller
      *         )
      *       )
      *    ),
+     *
      *    @OA\Response(
      *       response=200,
      *       description="Login successful",
+     *
      *       @OA\JsonContent(
+     *
      *         @OA\Property(
      *           property="user",
      *           type="object",
@@ -138,10 +151,13 @@ class AuthController extends Controller
      *         )
      *       )
      *    ),
+     *
      *    @OA\Response(
      *       response=422,
      *       description="Invalid credentials",
+     *
      *       @OA\JsonContent(
+     *
      *         @OA\Property(
      *           property="message",
      *           type="string",
@@ -153,6 +169,7 @@ class AuthController extends Controller
      *           @OA\Property(
      *             property="email",
      *             type="array",
+     *
      *             @OA\Items(type="string", example="Les informations fournies ne sont pas cohérentes.")
      *           )
      *         )
@@ -164,7 +181,7 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Les informations fournies ne sont pas cohérentes.'],
             ]);
@@ -174,7 +191,7 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'token' => $token
+            'token' => $token,
         ], Response::HTTP_OK);
     }
 
@@ -186,10 +203,13 @@ class AuthController extends Controller
      *    summary="Logout user",
      *    description="Revokes the current access token and logs out the user",
      *    security={{"sanctum":{}}},
+     *
      *    @OA\Response(
      *       response=200,
      *       description="Logout successful",
+     *
      *       @OA\JsonContent(
+     *
      *         @OA\Property(
      *           property="message",
      *           type="string",
@@ -197,6 +217,7 @@ class AuthController extends Controller
      *         )
      *       )
      *    ),
+     *
      *    @OA\Response(response=401, description="Unauthenticated")
      * )
      */
@@ -205,7 +226,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Déconnecté avec succès'
+            'message' => 'Déconnecté avec succès',
         ], Response::HTTP_OK);
     }
 
@@ -217,10 +238,13 @@ class AuthController extends Controller
      *    summary="Get current authenticated user",
      *    description="Returns the currently authenticated user's information",
      *    security={{"sanctum":{}}},
+     *
      *    @OA\Response(
      *       response=200,
      *       description="User data retrieved successfully",
+     *
      *       @OA\JsonContent(
+     *
      *         @OA\Property(
      *           property="user",
      *           type="object",
@@ -232,13 +256,14 @@ class AuthController extends Controller
      *         )
      *       )
      *    ),
+     *
      *    @OA\Response(response=401, description="Unauthenticated")
      * )
      */
     public function user(Request $request)
     {
         return response()->json([
-            'user' => $request->user()
+            'user' => $request->user(),
         ], Response::HTTP_OK);
     }
 }

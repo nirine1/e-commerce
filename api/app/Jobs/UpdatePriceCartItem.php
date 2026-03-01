@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\CartItem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use App\Models\CartItem;
 
 class UpdatePriceCartItem implements ShouldQueue
 {

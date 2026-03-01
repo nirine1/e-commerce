@@ -221,7 +221,7 @@ return [
                  * Examples of Securities
                  */
                 [
-                    'sanctum' => []
+                    'sanctum' => [],
                     /*
                     'oauth2_security_example' => [
                         'read',

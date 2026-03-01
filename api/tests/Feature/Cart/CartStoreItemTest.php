@@ -10,35 +10,35 @@ use Tests\TestCase;
 
 class CartStoreItemTest extends TestCase
 {
-    use RefreshDatabase, HasCartSetup;
+    use HasCartSetup, RefreshDatabase;
 
     public function test_authenticated_user_can_add_item_to_cart(): void
     {
         $data = [
             'product_id' => $this->product->id,
-            'quantity' => 3
+            'quantity' => 3,
         ];
 
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/cart/items', $data);
+            ->postJson('/api/cart/items', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonStructure([
-                     'data' => [
-                         'id',
-                         'cart_id',
-                         'product_id',
-                         'quantity',
-                         'price',
-                         'product'
-                     ]
-                 ])
-                 ->assertJsonPath('data.product_id', $this->product->id)
-                 ->assertJsonPath('data.quantity', 3);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'cart_id',
+                    'product_id',
+                    'quantity',
+                    'price',
+                    'product',
+                ],
+            ])
+            ->assertJsonPath('data.product_id', $this->product->id)
+            ->assertJsonPath('data.quantity', 3);
 
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $this->product->id,
-            'quantity' => 3
+            'quantity' => 3,
         ]);
     }
 
@@ -48,22 +48,22 @@ class CartStoreItemTest extends TestCase
         $data = [
             'product_id' => $this->product->id,
             'quantity' => 2,
-            'session_id' => $sessionId
+            'session_id' => $sessionId,
         ];
 
         $response = $this->postJson('/api/cart/items', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonPath('data.product_id', $this->product->id)
-                 ->assertJsonPath('data.quantity', 2);
+            ->assertJsonPath('data.product_id', $this->product->id)
+            ->assertJsonPath('data.quantity', 2);
 
         $this->assertDatabaseHas('carts', [
-            'session_id' => $sessionId
+            'session_id' => $sessionId,
         ]);
 
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
     }
 
@@ -73,28 +73,28 @@ class CartStoreItemTest extends TestCase
         CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $this->product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $data = [
             'product_id' => $this->product->id,
-            'quantity' => 3
+            'quantity' => 3,
         ];
 
         $response = $this->actingAs($this->user)
-                        ->postJson('/api/cart/items', $data);
+            ->postJson('/api/cart/items', $data);
 
         // When adding to an existing item, we get 200 (update), not 201 (create)
         $response->assertStatus(200)
-                ->assertJsonPath('data.product_id', $this->product->id)
-                ->assertJsonPath('data.quantity', 5); // 2 + 3 = 5
+            ->assertJsonPath('data.product_id', $this->product->id)
+            ->assertJsonPath('data.quantity', 5); // 2 + 3 = 5
 
         // Verify the quantity was increased (2 + 3 = 5)
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $this->product->id,
-            'quantity' => 5
+            'quantity' => 5,
         ]);
-        
+
         // Verify we still have only ONE cart item (not two)
         $this->assertDatabaseCount('cart_items', 1);
     }
@@ -103,54 +103,54 @@ class CartStoreItemTest extends TestCase
     {
         $data = [
             'product_id' => 99999,
-            'quantity' => 1
+            'quantity' => 1,
         ];
 
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/cart/items', $data);
+            ->postJson('/api/cart/items', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['product_id']);
+            ->assertJsonValidationErrors(['product_id']);
     }
 
     public function test_add_item_fails_with_missing_quantity(): void
     {
         $data = [
-            'product_id' => $this->product->id
+            'product_id' => $this->product->id,
         ];
 
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/cart/items', $data);
+            ->postJson('/api/cart/items', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['quantity']);
+            ->assertJsonValidationErrors(['quantity']);
     }
 
     public function test_add_item_fails_with_zero_quantity(): void
     {
         $data = [
             'product_id' => $this->product->id,
-            'quantity' => 0
+            'quantity' => 0,
         ];
 
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/cart/items', $data);
+            ->postJson('/api/cart/items', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['quantity']);
+            ->assertJsonValidationErrors(['quantity']);
     }
 
     public function test_add_item_fails_with_negative_quantity(): void
     {
         $data = [
             'product_id' => $this->product->id,
-            'quantity' => -5
+            'quantity' => -5,
         ];
 
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/cart/items', $data);
+            ->postJson('/api/cart/items', $data);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['quantity']);
+            ->assertJsonValidationErrors(['quantity']);
     }
 }
