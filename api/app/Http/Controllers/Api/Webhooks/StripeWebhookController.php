@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\Api\Webhooks;
 
 use App\Http\Controllers\Controller;
-use App\Models\Payment;
-use App\Models\Order;
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\Payment;
 use App\Models\User;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Services\StripeService;
 
 class StripeWebhookController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
-    }
-    
+    public function __construct(private StripeService $stripeService) {}
+
     /**
      * Point d'entrée pour tous les webhooks Stripe
      */
@@ -30,7 +28,7 @@ class StripeWebhookController extends Controller
 
             Log::channel('stripe')->info('Webhook received', [
                 'type' => $event->type,
-                'id' => $event->id
+                'id' => $event->id,
             ]);
 
             // Traiter l'événement selon son type
@@ -48,14 +46,15 @@ class StripeWebhookController extends Controller
                     break;
 
                 default:
-                    Log::channel('stripe')->info('Unhandled webhook event type: ' . $event->type);
+                    Log::channel('stripe')->info('Unhandled webhook event type: '.$event->type);
             }
 
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
-            Log::channel('stripe')->error('Webhook error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::channel('stripe')->error('Webhook error: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
@@ -77,27 +76,30 @@ class StripeWebhookController extends Controller
         $orderId = $session->metadata->order_id ?? null;
         $userId = $session->metadata->user_id ?? null;
 
-        if (!$orderId || !$userId) {
+        if (! $orderId || ! $userId) {
             Log::channel('stripe')->error('Missing metadata in checkout session', [
                 'session_id' => $session->id,
                 'order_id' => $orderId,
                 'user_id' => $userId,
             ]);
+
             return;
         }
 
         try {
             // Récupérer l'utilisateur
             $user = User::find($userId);
-            if (!$user) {
+            if (! $user) {
                 Log::channel('stripe')->error('User not found', ['user_id' => $userId]);
+
                 return;
             }
 
             // Récupérer la commande
             $order = Order::find($orderId);
-            if (!$order) {
+            if (! $order) {
                 Log::channel('stripe')->error('Order not found', ['order_id' => $orderId]);
+
                 return;
             }
 
@@ -139,7 +141,7 @@ class StripeWebhookController extends Controller
             ]);
         }
     }
-    
+
     /**
      * Gérer l'événement payment_intent.succeeded
      * Événement de confirmation supplémentaire
@@ -155,7 +157,7 @@ class StripeWebhookController extends Controller
         try {
             // Trouver le paiement par payment_intent_id
             $payment = Payment::where('stripe_payment_intent_id', $paymentIntent->id)->first();
-            
+
             if ($payment) {
                 // Mettre à jour le statut si ce n'est pas déjà fait
                 if ($payment->status !== 'success') {
@@ -196,7 +198,7 @@ class StripeWebhookController extends Controller
         try {
             // Trouver le paiement par payment_intent_id
             $payment = Payment::where('stripe_payment_intent_id', $paymentIntent->id)->first();
-            
+
             if ($payment) {
                 // Mettre à jour le statut en échec
                 $payment->update([

@@ -44,7 +44,7 @@ class Product extends Model
     ];
 
     protected $with = [
-        'images'
+        'images',
     ];
 
     /**

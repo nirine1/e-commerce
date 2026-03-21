@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use Stripe\Checkout\Session;
 use Stripe\StripeClient;
 use Stripe\Webhook;
-use Stripe\Checkout\Session;
 
 class StripeService
 {
@@ -19,23 +19,22 @@ class StripeService
      * Créer une session Stripe Checkout
      */
     public function createCheckoutSession(
-        float $amount, 
-        $user, 
-        string $successUrl, 
-        string $cancelUrl, 
+        float $amount,
+        $user,
+        string $successUrl,
+        string $cancelUrl,
         int $orderId
-    ): Session
-    {
+    ): Session {
         $session = $this->stripe->checkout->sessions->create([
             'payment_method_types' => ['card'],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
-                        'name' => 'Commande #' . $orderId,
+                        'name' => 'Commande #'.$orderId,
                         'description' => 'Paiement de la commande',
                     ],
-                    'unit_amount' => (int)($amount * 100),
+                    'unit_amount' => (int) ($amount * 100),
                 ],
                 'quantity' => 1,
             ]],

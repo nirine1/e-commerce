@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Services\StripeService;
-use App\Models\Payment;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
+use App\Models\Payment;
+use App\Services\StripeService;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @OA\Tag(
@@ -19,9 +17,7 @@ use Illuminate\Support\Facades\DB;
  */
 class PaymentController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
-    }
+    public function __construct(private StripeService $stripeService) {}
 
     /**
      * @OA\Post(
@@ -34,7 +30,9 @@ class PaymentController extends Controller
      *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="order_id", type="integer", example=123),
      *             @OA\Property(property="success_url", type="string", example="https://frontend.com/payment/success"),
      *             @OA\Property(property="cancel_url", type="string", example="https://frontend.com/payment/cancel")
@@ -44,7 +42,9 @@ class PaymentController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Checkout session created successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="order_id", type="integer", example=123),
      *             @OA\Property(property="checkout_url", type="string", example="https://checkout.stripe.com/pay/cs_test_1234567890"),
@@ -58,7 +58,6 @@ class PaymentController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-
     public function createOrderAndCheckout(Request $request)
     {
         try {
@@ -70,7 +69,7 @@ class PaymentController extends Controller
             ]);
 
             $user = $request->user();
-            
+
             // Récupérer la commande existante
             $order = Order::findOrFail($validated['order_id']);
 
@@ -86,7 +85,7 @@ class PaymentController extends Controller
             $existingPayment = Payment::where('order_id', $order->id)
                 ->where('status', 'success')
                 ->first();
-                
+
             if ($existingPayment) {
                 return response()->json([
                     'success' => false,
@@ -107,7 +106,7 @@ class PaymentController extends Controller
             Payment::updateOrCreate(
                 [
                     'order_id' => $order->id,
-                    'status' => 'pending'
+                    'status' => 'pending',
                 ],
                 [
                     'user_id' => $user->id,
@@ -158,13 +157,16 @@ class PaymentController extends Controller
      *         in="path",
      *         required=true,
      *         description="Stripe Checkout Session ID",
+     *
      *         @OA\Schema(type="string", example="cs_test_1234567890")
      *     ),
      *
      *     @OA\Response(
      *         response=200,
      *         description="Payment verified successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="payment",
@@ -184,22 +186,21 @@ class PaymentController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-
     public function verifyPayment(string $sessionId)
     {
         try {
             $user = auth()->user();
-            
+
             // Récupérer le paiement par session_id
             $payment = Payment::where('stripe_session_id', $sessionId)->first();
-            
-            if (!$payment) {
+
+            if (! $payment) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Paiement introuvable',
                 ], 404);
             }
-            
+
             // Vérifier que le paiement appartient à l'utilisateur
             if ($payment->user_id !== $user->id) {
                 return response()->json([
@@ -207,7 +208,7 @@ class PaymentController extends Controller
                     'message' => 'Non autorisé',
                 ], 403);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'payment' => [
@@ -219,7 +220,7 @@ class PaymentController extends Controller
                     'paid_at' => $payment->paid_at,
                 ],
             ], 200);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
