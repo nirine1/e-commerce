@@ -7,12 +7,12 @@ import { Link } from "react-router-dom";
 const CartItemList = ({ items, updateCartItem, removeCartItem }) => {
     return (
         <div className="space-y-6">
-            {items.length === 0 && (
+            {(!items || items.length === 0) && (
                 <div>
                     Vous n'avez rien dans votre panier, commencer par <Link to="/products" className="underline font-semibold">choisir des articles</Link>.
                 </div>
             )}
-            {items.map((item) => (
+            {items && items.map((item) => (
                 <div className="flex flex-row w-full h-36 items-center gap-6 overflow-hidden" key={item.id}>
                     <img className="w-36 h-full object-cover" src={item.product.primary_image.image_url} alt={item.product.name} />
                     <div className="flex flex-col justify-between w-full h-full">
