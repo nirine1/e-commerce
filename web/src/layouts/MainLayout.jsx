@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/auth";
 import LoadingMessage from "../components/LoadingMessage";
 import { CartProvider } from "../contexts/cart";
 
-export default function MainLayout({ isProtected = false, isAuth = false }) {
+export default function MainLayout({ isProtected = false, isAuth = false, showNavbar = true }) {
     const { user, loading } = useAuth();
 
     if (loading) return <LoadingMessage message="Vérification de l'authentification..." />;
@@ -20,7 +20,7 @@ export default function MainLayout({ isProtected = false, isAuth = false }) {
     return (
         <div className="min-h-screen flex flex-col">
             <CartProvider>
-                <MainNavbar />
+                { showNavbar && <MainNavbar /> }
 
                 <main className="flex-grow container mx-auto px-6 py-4">
                     <Outlet />

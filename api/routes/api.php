@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\Webhooks\StripeWebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -74,4 +76,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
     // TODO: Add routes for Cart, Orders, Addresses, etc.
+    // Checkout - Initier le paiement d'une commande
+    Route::post('/checkout', [PaymentController::class, 'createOrderAndCheckout']);
+    Route::get('/verify/{sessionId}', [PaymentController::class, 'verifyPayment']);
+
 });
+
+Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handleWebhook']);

@@ -1026,6 +1026,172 @@
                 ]
             }
         },
+        "/payments/checkout": {
+            "post": {
+                "tags": [
+                    "Stripe Payments"
+                ],
+                "summary": "Create Order and Stripe Checkout Session",
+                "description": "Create an order and initiate a Stripe Checkout session",
+                "operationId": "create-order-and-checkout",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "order_id": {
+                                        "type": "integer",
+                                        "example": 123
+                                    },
+                                    "success_url": {
+                                        "type": "string",
+                                        "example": "https://frontend.com/payment/success"
+                                    },
+                                    "cancel_url": {
+                                        "type": "string",
+                                        "example": "https://frontend.com/payment/cancel"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Checkout session created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "order_id": {
+                                            "type": "integer",
+                                            "example": 123
+                                        },
+                                        "checkout_url": {
+                                            "type": "string",
+                                            "example": "https://checkout.stripe.com/pay/cs_test_1234567890"
+                                        },
+                                        "session_id": {
+                                            "type": "string",
+                                            "example": "cs_test_1234567890"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/payments/verify/{sessionId}": {
+            "get": {
+                "tags": [
+                    "Stripe Payments"
+                ],
+                "summary": "Verify Payment Status",
+                "description": "Verify the status of a payment using the Stripe session ID",
+                "operationId": "verify-payment",
+                "parameters": [
+                    {
+                        "name": "sessionId",
+                        "in": "path",
+                        "description": "Stripe Checkout Session ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "cs_test_1234567890"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment verified successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payment": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "order_id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 49.99
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "eur"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "success"
+                                                },
+                                                "paid_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-01T12:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Payment not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/products": {
             "get": {
                 "tags": [
@@ -2019,6 +2185,10 @@
         {
             "name": "Cart Item",
             "description": "Shopping cart endpoints - manage cart items (requires authentication or session ID for guests)"
+        },
+        {
+            "name": "Stripe Payments",
+            "description": "Stripe payment endpoints - manage payments"
         },
         {
             "name": "Products",

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->ulid('order_number')->unique();
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'])
                 ->default('pending');
-            $table->string('currency')->default('USD');
+            $table->string('currency')->default('EUR');
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax_amount', 10, 2)->default(0);
             $table->decimal('shipping_amount', 10, 2)->default(0);
