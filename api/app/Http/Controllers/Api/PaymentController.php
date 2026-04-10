@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\StripeService;
@@ -63,35 +64,47 @@ class PaymentController extends Controller
         try {
             // Validation des données
             $validated = $request->validate([
-                'order_id' => 'required|exists:orders,id',
-                'success_url' => 'required|url',
+                'cart_id' => 'required|exists:carts,id',
+                'success_url' => 'required|string|starts_with:http',
                 'cancel_url' => 'required|url',
             ]);
 
             $user = $request->user();
 
-            // Récupérer la commande existante
-            $order = Order::findOrFail($validated['order_id']);
+            $cart = Cart::findOrFail($validated['cart_id']);
 
-            // Vérifier que la commande appartient bien à l'utilisateur
-            if ($order->user_id !== $user->id) {
+            // Vérifier que le panier appartient bien à l'utilisateur
+            if ($cart->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous n\'êtes pas autorisé à accéder à cette commande',
+                    'message' => 'Vous n\'êtes pas autorisé à accéder à ce panier',
                 ], 403);
             }
 
-            // Vérifier qu'il n'y a pas déjà un paiement réussi pour cette commande
-            $existingPayment = Payment::where('order_id', $order->id)
-                ->where('status', 'success')
-                ->first();
+            $items = $cart->items;
+            $subtotal = $items->sum(fn ($item) => $item->price * $item->quantity);
 
-            if ($existingPayment) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cette commande a déjà été payée',
-                ], 400);
-            }
+            // Récupérer la commande existante
+            $order = Order::create([
+                'user_id' => $user->id,
+                'subtotal' => $subtotal,
+                'total_amount' => $subtotal, // we don't have coupon / discounts / shipping fees yet
+                'currency' => 'EUR',
+                'billing_first_name' => $user->name,
+                'billing_last_name' => '',
+                'billing_address_line_1' => '',
+                'billing_city' => '',
+                'billing_state' => '',
+                'billing_postal_code' => '',
+                'billing_country' => '',
+                'shipping_first_name' => '',
+                'shipping_last_name' => '',
+                'shipping_address_line_1' => '',
+                'shipping_city' => '',
+                'shipping_state' => '',
+                'shipping_postal_code' => '',
+                'shipping_country' => ''
+            ]);
 
             // Créer la session Stripe Checkout avec les URLs du frontend
             $session = $this->stripeService->createCheckoutSession(

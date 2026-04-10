@@ -1,9 +1,20 @@
 import CartItemList from "../../components/cart/CartItemList";
 import { Button } from "@/components/ui/button";
 import { useCart } from "../../contexts/cart";
+import { paymentService } from "../../services/payment";
 
 const ShoppingCart = () => {
     const { items, count, total, updateCartItem, removeCartItem } = useCart();
+
+    const checkout = async () => {
+        const result = await paymentService.checkout({ cartId: items[0].cart_id });
+
+        if (result.success ?? false) {
+            window.location.href = result.data.checkout_url;
+        } else {
+            // show an alert of failed notification
+        }
+    };
 
     return (
         <>
@@ -32,7 +43,12 @@ const ShoppingCart = () => {
                             </div>
                         </div>
                         <div>
-                            <Button className="w-full text-md font-semibold" size="lg" disabled={count === 0}>
+                            <Button 
+                                className="w-full text-md font-semibold"
+                                size="lg"
+                                disabled={count === 0}
+                                onClick={() => checkout()}
+                            >
                                 Passer la commande
                             </Button>
                         </div>

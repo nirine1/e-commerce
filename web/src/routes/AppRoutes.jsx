@@ -8,6 +8,7 @@ import TestComponent from '../components/TestComponent';
 import ProductIndex from '../pages/products/ProductIndex';
 import ProductShow from '../pages/products/ProductShow';
 import ShoppingCart from '../pages/cart/ShoppingCart';
+import SuccessCheckout from '../pages/checkout/SuccessCheckout';
 
 const AppRoutes = () => {
     return (
@@ -25,6 +26,10 @@ const AppRoutes = () => {
                     <Route path="/products/:slug" element={<ProductShow />} />
 
                     <Route path="/cart" element={<ShoppingCart />} />
+                </Route>
+
+                <Route element={<MainLayout isProtected={false} isAuth={false} showNavbar={false} />}>
+                    <Route path="/checkout/success" element={<SuccessCheckout />} />
                 </Route>
 
                 <Route element={<MainLayout isProtected={true} />}>

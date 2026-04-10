@@ -9,7 +9,10 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'session_id'];
+    protected $fillable = [
+        'user_id',
+        'session_id'
+    ];
 
     protected $with = ['items.product']; // Eager load items and products by default
 
