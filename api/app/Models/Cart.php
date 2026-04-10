@@ -11,7 +11,7 @@ class Cart extends Model
 
     protected $fillable = [
         'user_id',
-        'session_id'
+        'session_id',
     ];
 
     protected $with = ['items.product']; // Eager load items and products by default

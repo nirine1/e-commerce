@@ -69,7 +69,7 @@ class Order extends Model
 
     public static function booted()
     {
-        static::creating(function($order) {
+        static::creating(function ($order) {
             if (empty($order->order_number)) {
                 $order->order_number = Str::ulid();
             }

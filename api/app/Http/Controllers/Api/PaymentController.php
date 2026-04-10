@@ -103,7 +103,7 @@ class PaymentController extends Controller
                 'shipping_city' => '',
                 'shipping_state' => '',
                 'shipping_postal_code' => '',
-                'shipping_country' => ''
+                'shipping_country' => '',
             ]);
 
             // Créer la session Stripe Checkout avec les URLs du frontend
